@@ -22,19 +22,19 @@ Before getting started you should obtain an API token, which can be retrieved us
 
 ```bash
 $ curl -X POST -d "username=$USERNAME&password=$PASSWORD" http://sitcalprd01.its.auckland.ac.nz:8000/api-token-auth
-{"token":"<YOUR_API_KEY>"}
+{"token":"<YOUR_API_TOKEN>"}
 ```
 
 Copy *JUST* the value of the token returned by the server. 
 
-> Make sure you keep this key safe as it is used by the server to determine the user that sends the requests as means of authentication, so you don't want other users to mess up with your calendars, or do you?
+> Make sure you keep this token safe as it is used by the server to determine the user that sends the requests as means of authentication, so you don't want other users to mess up with your calendars, or do you?
 
 ## Interacting with the server
 
 Now, in your Javascript code you may instantiate a client object:
 
 ```Javascript
-var client = new UoACalendarClient({ apiToken: "<YOUR_API_KEY>"} );
+var client = new UoACalendarClient({ apiToken: "<YOUR_API_TOKEN>"} );
 ```
 
 At this point you are ready to interact with the calendar backend.
