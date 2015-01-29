@@ -1,0 +1,31 @@
+{
+  "name": "uoacalendar-js",
+  "version": "1.0.0",
+  "description": "Javascript UoACalendar client library",
+  "main": "dist/uoacalendar.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublish": "make"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/UoA-CompSci/uoacalendar-js"
+  },
+  "keywords": [
+    "REST",
+    "Javascript",
+    "client",
+    "UoA",
+    "calendar"
+  ],
+  "author": "University of Auckland",
+  "license": "Apache 2.0",
+  "bugs": {
+    "url": "https://github.com/UoA-CompSci/uoacalendar-js/issues"
+  },
+  "homepage": "https://github.com/UoA-CompSci/uoacalendar-js",
+  "devDependencies": {
+    "browserify": "^8.1.1",
+    "coffeeify": "^1.0.0"
+  }
+}
