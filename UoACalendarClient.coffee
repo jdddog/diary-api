@@ -134,12 +134,12 @@ class UoACalendarClient
                 res.on('end', () ->
                     if (('' + res.statusCode).match(/^2\d\d$/))
                         # Request handled, happy
-                        if onSuccess then onSuccess(res, JSON.parse(data))
+                        if onSuccess then onSuccess(res, if data.length!=0 then JSON.parse(data) else {})
                     else
                         # Server error, I have no idea what happend in the backend
                         # but server at least returned correctly (in a HTTP protocol
                         # sense) formatted response
-                        if onError then onError(res, JSON.parse(data)) else console.error(res)
+                        if onError then onError(res, data) else console.error(res)
                 )
             )
 

@@ -64,11 +64,11 @@ UoACalendarClient = (function() {
       return res.on('end', function() {
         if (('' + res.statusCode).match(/^2\d\d$/)) {
           if (onSuccess) {
-            return onSuccess(res, JSON.parse(data));
+            return onSuccess(res, data.length !== 0 ? JSON.parse(data) : {});
           }
         } else {
           if (onError) {
-            return onError(res, JSON.parse(data));
+            return onError(res, data);
           } else {
             return console.error(res);
           }
