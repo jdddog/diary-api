@@ -62,7 +62,6 @@ UoACalendarClient = (function() {
         return data += chunk;
       });
       return res.on('end', function() {
-        console.log(data);
         if (('' + res.statusCode).match(/^2\d\d$/)) {
           if (onSuccess) {
             return onSuccess(res, JSON.parse(data));
@@ -93,7 +92,7 @@ UoACalendarClient = (function() {
   };
 
   UoACalendarClient.prototype.getCalendar = function(id, onSuccess, onError) {
-    return this.sendRequest('/calendars/' + id, 'GET', 0, onSuccess, onError);
+    return this.sendRequest('/calendars/' + id + '/', 'GET', 0, onSuccess, onError);
   };
 
   UoACalendarClient.prototype.addCalendar = function(name, onSuccess, onError) {
@@ -103,7 +102,7 @@ UoACalendarClient = (function() {
   };
 
   UoACalendarClient.prototype.deleteCalendar = function(id, onSuccess, onError) {
-    return this.sendRequest('/calendars/' + id, 'DELETE', onSuccess, onError);
+    return this.sendRequest('/calendars/' + id + '/', 'DELETE', onSuccess, onError);
   };
 
   UoACalendarClient.prototype.listEvents = function(calendarId, onSuccess, onError) {
@@ -115,11 +114,11 @@ UoACalendarClient = (function() {
   };
 
   UoACalendarClient.prototype.deleteEvent = function(calendarId, eventId, onSuccess, onError) {
-    return this.sendRequest('/calendars/' + calendarId + '/events/' + eventId, 'DELETE', 0, onSuccess, onError);
+    return this.sendRequest('/calendars/' + calendarId + '/events/' + eventId + '/', 'DELETE', 0, onSuccess, onError);
   };
 
   UoACalendarClient.prototype.updateEvent = function(calendarId, eventId, event, onSuccess, onError) {
-    return this.sendRequest('/calendars/' + calendarId + '/events/' + eventId, 'PATCH', event, onSuccess, onError);
+    return this.sendRequest('/calendars/' + calendarId + '/events/' + eventId + '/', 'PATCH', event, onSuccess, onError);
   };
 
   UoACalendarClient.prototype.findEvents = function(calendarId, startDate, endDate, onSuccess, onError) {

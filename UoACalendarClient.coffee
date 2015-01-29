@@ -132,7 +132,6 @@ class UoACalendarClient
                     data += chunk
                 )
                 res.on('end', () ->
-                    console.log(data)
                     if (('' + res.statusCode).match(/^2\d\d$/))
                         # Request handled, happy
                         if onSuccess then onSuccess(res, JSON.parse(data))
@@ -199,7 +198,7 @@ class UoACalendarClient
     # ```
     #
     getCalendar : (id, onSuccess, onError) ->
-        @sendRequest('/calendars/' + id, 'GET', 0, onSuccess, onError)
+        @sendRequest('/calendars/' + id + '/', 'GET', 0, onSuccess, onError)
 
     # Add a new calendar providing the new calendar's name
     #
@@ -241,7 +240,7 @@ class UoACalendarClient
     # ```
     #
     deleteCalendar: (id, onSuccess, onError) ->
-        @sendRequest('/calendars/' + id, 'DELETE', onSuccess, onError)
+        @sendRequest('/calendars/' + id + '/', 'DELETE', onSuccess, onError)
 
     #
     # Event objects management
@@ -309,7 +308,7 @@ class UoACalendarClient
     # ```
     #
     deleteEvent: (calendarId, eventId, onSuccess, onError) ->
-        @sendRequest('/calendars/' + calendarId + '/events/' + eventId, 'DELETE', 0, onSuccess, onError)
+        @sendRequest('/calendars/' + calendarId + '/events/' + eventId + '/', 'DELETE', 0, onSuccess, onError)
 
     # Update an existing event from a calendar giving their IDs
     #
@@ -330,7 +329,7 @@ class UoACalendarClient
     # ```
     #
     updateEvent: (calendarId, eventId, event, onSuccess, onError) ->
-        @sendRequest('/calendars/' + calendarId + '/events/' + eventId, 'PATCH', event, onSuccess, onError)
+        @sendRequest('/calendars/' + calendarId + '/events/' + eventId + '/', 'PATCH', event, onSuccess, onError)
 
     # Find events from an existing calendar within a given time range
     #
