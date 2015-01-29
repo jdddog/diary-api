@@ -2,7 +2,6 @@
 # ============================================
 
 http = require "http"
-https = require "https"
 
 # The UoACalendarClient class
 # ----------------
@@ -110,11 +109,28 @@ class UoACalendarClient
     #
     sendRequest : (path, method, data, onSuccess, onError) ->
 
+        getCookie = (name) ->
+            nameEQ = name + "="
+            ca = document.cookie.split(";")
+            i = 0
+            while i < ca.length
+                c = ca[i]
+                c = c.substring(1, c.length)  while c.charAt(0) is " "
+                return c.substring(nameEQ.length, c.length).replace(/"/g, '')  if c.indexOf(nameEQ) is 0
+                i++
+            ca
+
         getHeaders = () =>
-            return {
-                  'Content-Type': 'application/json',
-                  'Authorization': 'JWT ' + @apiToken
-            }
+            if @apiToken
+                return {
+                      'Content-Type': 'application/json'
+                      'Authorization': 'JWT ' + @apiToken
+                } 
+            else
+                return {
+                      'Content-Type': 'application/json'
+                      'X-CSRFToken': getCookie('csrftoken')
+                } 
 
         makeRequest = (path, method, data) =>
             return {
