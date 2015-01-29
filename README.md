@@ -34,7 +34,7 @@ Copy *JUST* the value of the token returned by the server.
 Now, in your Javascript code you may instantiate a client object:
 
 ```Javascript
-var client = new UoACalendarClient({ apiToken: "<YOUR_API_TOKEN>"} );
+var client = new UoACalendarClient({ apiToken: "<YOUR_API_TOKEN>"});
 ```
 
 At this point you are ready to interact with the calendar backend.
@@ -102,12 +102,12 @@ client.findEvents(calendarId, new Date(1977, 5, 25), Date.now(),
 
 ## Advanced requests
 
-For the full list of the calendar API endpoints, please refer to the [online documentation](http://sitcalprd01.its.auckland.ac.nz/docs].
+For the full list of the calendar API endpoints, please refer to the online documentation [here](http://sitcalprd01.its.auckland.ac.nz/docs).
 
 If the client does not provide a method specific to the endpoint that you want to use, you can use the `sendRequest` method:
 
 ```Javascript
-client.sendRequest('/resource/', 'GET', { myData: 1});
+client.sendRequest('/resource/', 'POST', { myData: 1});
 ```
 
 ## Development
