@@ -26,7 +26,7 @@ class UoACalendarClient
     # authentication server used by the client if no `port` configuration
     # is specified during the library initialization.
     #
-    DEFAULT_PORT : 8000
+    DEFAULT_PORT : 80
 
     # Initializing the client library
     # ----------------------------------------------------
