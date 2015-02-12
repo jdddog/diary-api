@@ -256,7 +256,7 @@ class UoACalendarClient
     # ```
     #
     deleteCalendar: (id, onSuccess, onError) ->
-        @sendRequest('/calendars/' + id + '/', 'DELETE', onSuccess, onError)
+        @sendRequest('/calendars/' + id + '/', 'DELETE', {}, onSuccess, onError)
 
     #
     # Event objects management
