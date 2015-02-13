@@ -33,7 +33,7 @@ UoACalendarClient = (function() {
   };
 
   UoACalendarClient.prototype.sendRequest = function(path, method, data, onSuccess, onError) {
-    var getCookie, getHeaders, makeRequest, req;
+    var getCookie, getHeaders;
     getCookie = function(name) {
       var c, ca, i, nameEQ;
       nameEQ = name + "=";
@@ -66,47 +66,22 @@ UoACalendarClient = (function() {
         }
       };
     })(this);
-    makeRequest = (function(_this) {
-      return function(path, method, data) {
-        return {
-          host: _this.host,
-          port: _this.port,
-          headers: getHeaders(),
-          path: path,
-          method: method,
-          withCredentials: false
-        };
-      };
-    })(this);
-    req = http.request(makeRequest(path, method, data), function(res) {
-      data = '';
-      res.on('data', function(chunk) {
-        return data += chunk;
-      });
-      return res.on('end', function() {
-        if (('' + res.statusCode).match(/^2\d\d$/)) {
-          if (onSuccess) {
-            return onSuccess(res, data.length !== 0 ? JSON.parse(data) : {});
-          }
+    return $.ajax({
+      url: this.host + ':' + this.port + path,
+      headers: getHeaders(),
+      type: method,
+      dataType: "json",
+      error: function(jqXHR, textStatus, errorThrown) {
+        return console.error(textStatus);
+      },
+      success: function(data, textStatus, jqXHR) {
+        if (data.length !== 0) {
+          return JSON.parse(data);
         } else {
-          if (onError) {
-            return onError(res, data);
-          } else {
-            return console.error(res);
-          }
+          return {};
         }
-      });
+      }
     });
-    req.on('error', function(e) {
-      return console.error(e);
-    });
-    req.on('timeout', function() {
-      return req.abort();
-    });
-    if (data) {
-      req.write(JSON.stringify(data));
-    }
-    return req.end();
   };
 
   UoACalendarClient.prototype.listCalendars = function(onSuccess, onError) {
@@ -124,7 +99,7 @@ UoACalendarClient = (function() {
   };
 
   UoACalendarClient.prototype.deleteCalendar = function(id, onSuccess, onError) {
-    return this.sendRequest('/calendars/' + id + '/', 'DELETE', {}, onSuccess, onError);
+    return this.sendRequest('/calendars/' + id + '/', 'DELETE', 0, onSuccess, onError);
   };
 
   UoACalendarClient.prototype.listEvents = function(calendarId, onSuccess, onError) {
