@@ -6,7 +6,7 @@ http = require("http");
 UoACalendarClient = (function() {
   UoACalendarClient.prototype.DEFAULT_HOST = 'sitcalprd01.its.auckland.ac.nz';
 
-  UoACalendarClient.prototype.DEFAULT_PORT = 80;
+  UoACalendarClient.prototype.DEFAULT_PORT = null;
 
   function UoACalendarClient(config) {
     if (config != null) {
@@ -33,7 +33,7 @@ UoACalendarClient = (function() {
   };
 
   UoACalendarClient.prototype.sendRequest = function(path, method, data, onSuccess, onError) {
-    var getCookie, getHeaders;
+    var getCookie, getHeaders, url;
     getCookie = function(name) {
       var c, ca, i, nameEQ;
       nameEQ = name + "=";
@@ -66,8 +66,14 @@ UoACalendarClient = (function() {
         }
       };
     })(this);
+    url = '';
+    if (this.port) {
+      url = this.host + ':' + this.port + path;
+    } else {
+      url = this.host + path;
+    }
     return $.ajax({
-      url: this.host + ':' + this.port + path,
+      url: url,
       headers: getHeaders(),
       type: method,
       dataType: "json",

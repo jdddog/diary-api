@@ -26,7 +26,7 @@ class UoACalendarClient
     # authentication server used by the client if no `port` configuration
     # is specified during the library initialization.
     #
-    DEFAULT_PORT : 80
+    DEFAULT_PORT : null
 
     # Initializing the client library
     # ----------------------------------------------------
@@ -141,8 +141,14 @@ class UoACalendarClient
         #        method: method
         #        withCredentials: false
         #    }
+        url = ''
+        if @port
+            url = @host + ':' + @port + path
+        else
+            url = @host + path
+
         $.ajax
-            url: @host + ':' + @port + path
+            url: url
             headers: getHeaders()
             type: method
             dataType: "json"
