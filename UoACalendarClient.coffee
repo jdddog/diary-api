@@ -20,7 +20,7 @@ class UoACalendarClient
     # is specified during the library initialization. By default,
     # the host points to the Gipsy-Danger API web server.
     #
-    DEFAULT_HOST : 'sitcalprd01.its.auckland.ac.nz'
+    DEFAULT_HOST : 'http://sitcalprd01.its.auckland.ac.nz'
 
     # `DEFAULT_PORT` specifies the default TCP port in the
     # authentication server used by the client if no `port` configuration
