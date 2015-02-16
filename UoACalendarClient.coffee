@@ -65,6 +65,8 @@ class UoACalendarClient
         { @host, @port, @apiToken } = config if config?
         @host       ?= @DEFAULT_HOST
         @port       ?= @DEFAULT_PORT
+        if !@host.match /^http\:\/\//i
+            @host = 'http://' + @host
 
 
     # Accessing the client settings
@@ -142,10 +144,17 @@ class UoACalendarClient
         #        withCredentials: false
         #    }
         url = ''
-        if @port
-            url = @host + ':' + @port + path
+        httpPattern = /^http:\/\/|https:\/\//
+
+        if @host.match httpPattern
+            url = @host
         else
-            url = @host + path
+            url = 'http://' + @host
+
+        if @port
+            url = url + ':' + @port + path
+        else
+            url = url + path
 
         $.ajax
             url: url

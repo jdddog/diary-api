@@ -18,6 +18,9 @@ UoACalendarClient = (function() {
     if (this.port == null) {
       this.port = this.DEFAULT_PORT;
     }
+    if (!this.host.match(/^http\:\/\//i)) {
+      this.host = 'http://' + this.host;
+    }
   }
 
   UoACalendarClient.prototype.getHost = function() {
@@ -33,7 +36,7 @@ UoACalendarClient = (function() {
   };
 
   UoACalendarClient.prototype.sendRequest = function(path, method, data, onSuccess, onError) {
-    var getCookie, getHeaders, url;
+    var getCookie, getHeaders, httpPattern, url;
     getCookie = function(name) {
       var c, ca, i, nameEQ;
       nameEQ = name + "=";
@@ -67,10 +70,16 @@ UoACalendarClient = (function() {
       };
     })(this);
     url = '';
-    if (this.port) {
-      url = this.host + ':' + this.port + path;
+    httpPattern = /^http:\/\/|https:\/\//;
+    if (this.host.match(httpPattern)) {
+      url = this.host;
     } else {
-      url = this.host + path;
+      url = 'http://' + this.host;
+    }
+    if (this.port) {
+      url = url + ':' + this.port + path;
+    } else {
+      url = url + path;
     }
     return $.ajax({
       url: url,
