@@ -9,6 +9,7 @@ UoACalendarClient = (function() {
   UoACalendarClient.prototype.DEFAULT_PORT = null;
 
   function UoACalendarClient(config) {
+    var httpPattern;
     if (config != null) {
       this.host = config.host, this.port = config.port, this.apiToken = config.apiToken;
     }
@@ -18,7 +19,8 @@ UoACalendarClient = (function() {
     if (this.port == null) {
       this.port = this.DEFAULT_PORT;
     }
-    if (!this.host.match(/^http\:\/\//i)) {
+    httpPattern = /^http:\/\/|https:\/\//;
+    if (!this.host.match(httpPattern)) {
       this.host = 'http://' + this.host;
     }
   }
@@ -36,7 +38,7 @@ UoACalendarClient = (function() {
   };
 
   UoACalendarClient.prototype.sendRequest = function(path, method, data, onSuccess, onError) {
-    var getCookie, getHeaders, httpPattern, url;
+    var getCookie, getHeaders, url;
     getCookie = function(name) {
       var c, ca, i, nameEQ;
       nameEQ = name + "=";
@@ -70,22 +72,17 @@ UoACalendarClient = (function() {
       };
     })(this);
     url = '';
-    httpPattern = /^http:\/\/|https:\/\//;
-    if (this.host.match(httpPattern)) {
-      url = this.host;
-    } else {
-      url = 'http://' + this.host;
-    }
     if (this.port) {
-      url = url + ':' + this.port + path;
+      url = this.host + ':' + this.port + path;
     } else {
-      url = url + path;
+      url = this.host + path;
     }
     return $.ajax({
       url: url,
       headers: getHeaders(),
       type: method,
       dataType: "json",
+      data: data,
       error: function(jqXHR, textStatus, errorThrown) {
         return console.error(textStatus);
       },
