@@ -4,12 +4,11 @@ var UoACalendarClient, http;
 http = require("http");
 
 UoACalendarClient = (function() {
-  UoACalendarClient.prototype.DEFAULT_HOST = 'http://sitcalprd01.its.auckland.ac.nz';
+  UoACalendarClient.prototype.DEFAULT_HOST = 'sitcalprd01.its.auckland.ac.nz';
 
-  UoACalendarClient.prototype.DEFAULT_PORT = null;
+  UoACalendarClient.prototype.DEFAULT_PORT = 80;
 
   function UoACalendarClient(config) {
-    var httpPattern;
     if (config != null) {
       this.host = config.host, this.port = config.port, this.apiToken = config.apiToken;
     }
@@ -18,10 +17,6 @@ UoACalendarClient = (function() {
     }
     if (this.port == null) {
       this.port = this.DEFAULT_PORT;
-    }
-    httpPattern = /^http:\/\/|https:\/\//;
-    if (!this.host.match(httpPattern)) {
-      this.host = 'http://' + this.host;
     }
   }
 
@@ -38,7 +33,7 @@ UoACalendarClient = (function() {
   };
 
   UoACalendarClient.prototype.sendRequest = function(path, method, data, onSuccess, onError) {
-    var getCookie, getHeaders, url;
+    var getCookie, getHeaders, makeRequest, req;
     getCookie = function(name) {
       var c, ca, i, nameEQ;
       nameEQ = name + "=";
@@ -60,40 +55,60 @@ UoACalendarClient = (function() {
       return function() {
         if (_this.apiToken) {
           return {
+            'Accept': 'application/json',
             'Content-Type': 'application/json',
             'Authorization': 'JWT ' + _this.apiToken
           };
         } else {
           return {
+            'Accept': 'application/json',
             'Content-Type': 'application/json',
             'X-CSRFToken': getCookie('csrftoken')
           };
         }
       };
     })(this);
-    url = '';
-    if (this.port) {
-      url = this.host + ':' + this.port + path;
-    } else {
-      url = this.host + path;
-    }
-    return $.ajax({
-      url: url,
-      headers: getHeaders(),
-      type: method,
-      dataType: "json",
-      data: data,
-      error: function(jqXHR, textStatus, errorThrown) {
-        return console.error(textStatus);
-      },
-      success: function(data, textStatus, jqXHR) {
-        if (data.length !== 0) {
-          return JSON.parse(data);
+    makeRequest = (function(_this) {
+      return function(path, method, data) {
+        return {
+          host: _this.host,
+          port: _this.port,
+          headers: getHeaders(),
+          path: path,
+          method: method,
+          withCredentials: false
+        };
+      };
+    })(this);
+    req = http.request(makeRequest(path, method, data), function(res) {
+      data = '';
+      res.on('data', function(chunk) {
+        return data += chunk;
+      });
+      return res.on('end', function() {
+        if (('' + res.statusCode).match(/^2\d\d$/)) {
+          if (onSuccess) {
+            return onSuccess(res, data.length !== 0 ? JSON.parse(data) : {});
+          }
         } else {
-          return {};
+          if (onError) {
+            return onError(res, data);
+          } else {
+            return console.error(res);
+          }
         }
-      }
+      });
     });
+    req.on('error', function(e) {
+      return console.error(e);
+    });
+    req.on('timeout', function() {
+      return req.abort();
+    });
+    if (data) {
+      req.write(JSON.stringify(data));
+    }
+    return req.end();
   };
 
   UoACalendarClient.prototype.listCalendars = function(onSuccess, onError) {
@@ -111,7 +126,7 @@ UoACalendarClient = (function() {
   };
 
   UoACalendarClient.prototype.deleteCalendar = function(id, onSuccess, onError) {
-    return this.sendRequest('/calendars/' + id + '/', 'DELETE', 0, onSuccess, onError);
+    return this.sendRequest('/calendars/' + id + '/', 'DELETE', {}, onSuccess, onError);
   };
 
   UoACalendarClient.prototype.listEvents = function(calendarId, onSuccess, onError) {

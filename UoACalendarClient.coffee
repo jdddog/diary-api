@@ -20,13 +20,13 @@ class UoACalendarClient
     # is specified during the library initialization. By default,
     # the host points to the Gipsy-Danger API web server.
     #
-    DEFAULT_HOST : 'http://sitcalprd01.its.auckland.ac.nz'
+    DEFAULT_HOST : 'sitcalprd01.its.auckland.ac.nz'
 
     # `DEFAULT_PORT` specifies the default TCP port in the
     # authentication server used by the client if no `port` configuration
     # is specified during the library initialization.
     #
-    DEFAULT_PORT : null
+    DEFAULT_PORT : 80
 
     # Initializing the client library
     # ----------------------------------------------------
@@ -65,9 +65,6 @@ class UoACalendarClient
         { @host, @port, @apiToken } = config if config?
         @host       ?= @DEFAULT_HOST
         @port       ?= @DEFAULT_PORT
-        httpPattern = /^http:\/\/|https:\/\//
-        if !@host.match httpPattern
-            @host = 'http://' + @host
 
 
     # Accessing the client settings
@@ -126,68 +123,53 @@ class UoACalendarClient
         getHeaders = () =>
             if @apiToken
                 return {
+                      'Accept': 'application/json'
                       'Content-Type': 'application/json'
                       'Authorization': 'JWT ' + @apiToken
                 } 
             else
                 return {
+                      'Accept': 'application/json'
                       'Content-Type': 'application/json'
                       'X-CSRFToken': getCookie('csrftoken')
                 } 
+            
+        makeRequest = (path, method, data) =>
+            return {
+                host: @host
+                port: @port
+                headers: getHeaders()
+                path: path
+                method: method
+                withCredentials: false
+            }
 
-        # makeRequest = (path, method, data) =>
-        #    return {
-        #        host: @host
-        #        port: @port
-        #        headers: getHeaders()
-        #        path: path
-        #        method: method
-        #        withCredentials: false
-        #    }
-        url = ''
+        req = http.request(makeRequest(path, method, data), (res) ->
+                data = ''
+                res.on('data', (chunk) ->
+                    data += chunk
+                )
+                res.on('end', () ->
+                    if (('' + res.statusCode).match(/^2\d\d$/))
+                        # Request handled, happy
+                        if onSuccess then onSuccess(res, if data.length!=0 then JSON.parse(data) else {})
+                    else
+                        # Server error, I have no idea what happend in the backend
+                        # but server at least returned correctly (in a HTTP protocol
+                        # sense) formatted response
+                        if onError then onError(res, data) else console.error(res)
+                )
+            )
 
-        if @port
-            url = @host + ':' + @port + path
-        else
-            url = @host + path
+        req.on('error', (e) -> console.error(e))
 
-        $.ajax
-            url: url
-            headers: getHeaders()
-            type: method
-            dataType: "json"
-            data: data
-            error: (jqXHR, textStatus, errorThrown) ->
-                console.error(textStatus)
-            success: (data, textStatus, jqXHR) ->
-                if data.length!=0 then JSON.parse(data) else {}
+        req.on('timeout', () -> req.abort())
 
-        # req = http.request(makeRequest(path, method, data), (res) ->
-        #        data = ''
-        #        res.on('data', (chunk) ->
-        #            data += chunk
-        #        )
-        #        res.on('end', () ->
-        #            if (('' + res.statusCode).match(/^2\d\d$/))
-        #                # Request handled, happy
-        #                if onSuccess then onSuccess(res, if data.length!=0 then JSON.parse(data) else {})
-        #            else
-        #                # Server error, I have no idea what happend in the backend
-        #                # but server at least returned correctly (in a HTTP protocol
-        #                # sense) formatted response
-        #                if onError then onError(res, data) else console.error(res)
-        #        )
-        #    )
-
-        # req.on('error', (e) -> console.error(e))
-
-        # req.on('timeout', () -> req.abort())
-
-        # if data
-        #    req.write(JSON.stringify(data))
+        if data
+            req.write(JSON.stringify(data))
 
         # Send request
-        # req.end()
+        req.end()
 
     #
     # Calendar objects management
@@ -276,7 +258,7 @@ class UoACalendarClient
     # ```
     #
     deleteCalendar: (id, onSuccess, onError) ->
-        @sendRequest('/calendars/' + id + '/', 'DELETE', 0, onSuccess, onError)
+        @sendRequest('/calendars/' + id + '/', 'DELETE', {}, onSuccess, onError)
 
     #
     # Event objects management
