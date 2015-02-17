@@ -138,6 +138,7 @@ class UoACalendarClient
             return {
                 host: @host
                 port: @port
+                scheme: 'http'
                 headers: getHeaders()
                 path: path
                 method: method

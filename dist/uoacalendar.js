@@ -73,6 +73,7 @@ UoACalendarClient = (function() {
         return {
           host: _this.host,
           port: _this.port,
+          scheme: 'http',
           headers: getHeaders(),
           path: path,
           method: method,
