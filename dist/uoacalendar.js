@@ -6,7 +6,7 @@ http = require("http");
 UoACalendarClient = (function() {
   UoACalendarClient.prototype.DEFAULT_HOST = 'sitcalprd01.its.auckland.ac.nz';
 
-  UoACalendarClient.prototype.DEFAULT_PORT = 80;
+  UoACalendarClient.prototype.DEFAULT_PORT = 345;
 
   function UoACalendarClient(config) {
     if (config != null) {
