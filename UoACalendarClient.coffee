@@ -285,7 +285,7 @@ class UoACalendarClient
     # ```
     #
     listEvents: (calendarId, onSuccess, onError) ->
-        @sendRequest('/calendars/' + calendarId + '/events/', 'GET', 0, onSuccess, onError)
+        @sendRequest('/calendars/' + calendarId + '/events/?format=json', 'GET', 0, onSuccess, onError)
 
     # Add a new event to an existing calendar given its ID
     #
