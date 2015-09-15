@@ -21,7 +21,7 @@ Then just include the script into your HTML code:
 Before getting started you should obtain an API token, which can be retrieved using your UPI credentials:
 
 ```bash
-$ curl -X POST -d "username=$USERNAME&password=$PASSWORD" http://sitcalprd01.its.auckland.ac.nz:8000/api-token-auth
+$ curl -X POST -d "username=$USERNAME&password=$PASSWORD" http://diaryapi.auckland.ac.nz:8000/api-token-auth
 {"token":"<YOUR_API_TOKEN>"}
 ```
 
@@ -102,7 +102,7 @@ client.findEvents(calendarId, new Date(1977, 5, 25), Date.now(),
 
 ## Advanced requests
 
-For the full list of the calendar API endpoints, please refer to the online documentation [here](http://sitcalprd01.its.auckland.ac.nz/docs).
+For the full list of the calendar API endpoints, please refer to the online documentation [here](http://diaryapi.auckland.ac.nz/docs).
 
 If the client does not provide a method specific to the endpoint that you want to use, you can use the `sendRequest` method:
 

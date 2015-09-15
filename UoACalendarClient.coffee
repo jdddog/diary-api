@@ -20,7 +20,7 @@ class UoACalendarClient
     # is specified during the library initialization. By default,
     # the host points to the Gipsy-Danger API web server.
     #
-    DEFAULT_HOST : 'sitcalprd01.its.auckland.ac.nz'
+    DEFAULT_HOST : 'diaryapi.auckland.ac.nz'
 
     # `DEFAULT_PORT` specifies the default TCP port in the
     # authentication server used by the client if no `port` configuration
@@ -51,7 +51,7 @@ class UoACalendarClient
     # Your API token can be retrieved from the server as follows:
     #
     # ```bash
-    # $ curl -X POST -d "username=$USERNAME&password=$PASSWORD" http://sitcalprd01.its.auckland.ac.nz:8000/api-token-auth
+    # $ curl -X POST -d "username=$USERNAME&password=$PASSWORD" http://diaryapi.auckland.ac.nz:8000/api-token-auth
     # {"token":"<YOUR_API_TOKEN>"}
     # ```
     #
