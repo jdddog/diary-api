@@ -47,7 +47,6 @@ class UoACalendarClient
   ###
 
   constructor: (apiToken, host, port) ->
-    { @host, @port, @apiToken } = config if config?
     @host ?= @DEFAULT_HOST
     @port ?= @DEFAULT_PORT
 
@@ -720,5 +719,5 @@ class UoACalendarClient
 
 exports.UoACalendarClient = UoACalendarClient
 
-module.exports = (config) ->
-  return new UoACalendarClient(config)
+module.exports = (apiToken, host, port) ->
+  return new UoACalendarClient(apiToken, host, port)
