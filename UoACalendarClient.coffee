@@ -47,8 +47,21 @@ class UoACalendarClient
   ###
 
   constructor: (apiToken, host, port) ->
-    @host ?= @DEFAULT_HOST
-    @port ?= @DEFAULT_PORT
+    if apiToken?
+      @apiToken = apiToken
+    else
+      console.error('UoACalendarClient constructor: please specify an apiToken')
+
+    if host?
+      @host = host
+    else
+      @host = @DEFAULT_HOST
+
+    if port?
+      @port = port
+    else
+      @port = @DEFAULT_PORT
+
 
   ###*
   * Return host used by UoACalendarClient instance.
@@ -142,7 +155,22 @@ class UoACalendarClient
       res.on('end', () ->
         if (('' + res.statusCode).match(/^2\d\d$/))
         # Request handled, happy
-          if onSuccess then onSuccess(res, if data.length != 0 then JSON.parse(data) else {})
+          if onSuccess
+            parsed = {}
+            if data.length != 0
+              parsed = JSON.parse(data)
+
+            for k,v of parsed
+              if v.start?
+                v.start = new Date(v.start)
+
+              if v.end?
+                v.end = new Date(v.end)
+
+              if v.lastUpdate?
+                v.lastUpdate = new Date(v.lastUpdate)
+
+            onSuccess(res, parsed)
         else
           # Server error, I have no idea what happend in the backend
           # but server at least returned correctly (in a HTTP protocol
