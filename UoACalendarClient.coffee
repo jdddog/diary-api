@@ -110,7 +110,7 @@ class UoACalendarClient
   * @private
   ###
 
-  sendRequest: (path, method, data, onSuccess, onError) ->
+  sendRequest: (path, method, data, resolve, reject) ->
     getCookie = (name) ->
       nameEQ = name + "="
       ca = document.cookie.split(";")
@@ -153,39 +153,37 @@ class UoACalendarClient
         data += chunk
       )
       res.on('end', () ->
-        if (('' + res.statusCode).match(/^2\d\d$/))
-        # Request handled, happy
-          if onSuccess
-            parsed = {}
-            if data.length != 0
-              parsed = JSON.parse(data)
+        if (('' + res.statusCode).match(/^2\d\d$/)) # Request handled, happy
+          parsed = {}
+          if data.length != 0
+            parsed = JSON.parse(data)
 
-            if parsed.constructor is Array
-              for k,v of parsed
-                if v.hasOwnProperty('start')
-                  v.start = new Date(v.start)
+          if parsed.constructor is Array
+            for k,v of parsed
+              if v.hasOwnProperty('start')
+                v.start = new Date(v.start)
 
-                if v.hasOwnProperty('end')
-                  v.end = new Date(v.end)
+              if v.hasOwnProperty('end')
+                v.end = new Date(v.end)
 
-                if v.hasOwnProperty('lastUpdate')
-                  v.lastUpdate = new Date(v.lastUpdate)
-            else
-                if parsed.hasOwnProperty('start')
-                  parsed.start = new Date(parsed.start)
+              if v.hasOwnProperty('lastUpdate')
+                v.lastUpdate = new Date(v.lastUpdate)
+          else
+            if parsed.hasOwnProperty('start')
+              parsed.start = new Date(parsed.start)
 
-                if parsed.hasOwnProperty('end')
-                  parsed.end = new Date(parsed.end)
+            if parsed.hasOwnProperty('end')
+              parsed.end = new Date(parsed.end)
 
-                if parsed.hasOwnProperty('lastUpdate')
-                  parsed.lastUpdate = new Date(parsed.lastUpdate)
+            if parsed.hasOwnProperty('lastUpdate')
+              parsed.lastUpdate = new Date(parsed.lastUpdate)
 
-            onSuccess(res, parsed)
+          resolve({res: res, data: parsed})
         else
           # Server error, I have no idea what happend in the backend
           # but server at least returned correctly (in a HTTP protocol
           # sense) formatted response
-          if onError then onError(res, data) else console.error(res)
+          reject({res: res, data: data})
       )
     )
 
@@ -219,8 +217,9 @@ class UoACalendarClient
   * );
   ###
 
-  listCalendars: (onSuccess, onError) ->
-    @sendRequest('/calendars/', 'GET', 0, onSuccess, onError)
+  listCalendars: () ->
+      action = (resolve, reject) -> @sendRequest('/calendars/', 'GET', 0, resolve, reject)
+      new Promise(action.bind(@))
 
   ###*
   * Callback, returns an array of calendars.
@@ -266,8 +265,9 @@ class UoACalendarClient
   * );
   ###
 
-  getCalendar: (id, onSuccess, onError) ->
-    @sendRequest('/calendars/' + id + '/', 'GET', 0, onSuccess, onError)
+  getCalendar: (id) ->
+    action = (resolve, reject) -> @sendRequest('/calendars/' + id + '/', 'GET', 0, resolve, reject)
+    new Promise(action.bind(@))
 
   ###*
   * Callback, returns particular calendar including its name and id. TODO: return custom fields here.
@@ -317,8 +317,9 @@ class UoACalendarClient
   * );
   ###
 
-  addCalendar: (name, onSuccess, onError) ->
-    @sendRequest('/calendars/', 'POST', {name: name}, onSuccess, onError)
+  addCalendar: (name) ->
+    action = (resolve, reject) -> @sendRequest('/calendars/', 'POST', {name: name}, resolve, reject)
+    new Promise(action.bind(@))
 
   ###*
   * Callback function, executed when calendar successfully added.
@@ -365,8 +366,9 @@ class UoACalendarClient
   * );
   ###
 
-  deleteCalendar: (id, onSuccess, onError) ->
-    @sendRequest('/calendars/' + id + '/', 'DELETE', {}, onSuccess, onError)
+  deleteCalendar: (id) ->
+    action = (resolve, reject) -> @sendRequest('/calendars/' + id + '/', 'DELETE', {}, resolve, reject)
+    new Promise(action.bind(@))
 
   ###*
   * Callback, executed when calendar successfully deleted.
@@ -413,8 +415,9 @@ class UoACalendarClient
   * );
   ###
 
-  listEvents: (calendarId, onSuccess, onError) ->
-    @sendRequest('/calendars/' + calendarId + '/events/', 'GET', 0, onSuccess, onError)
+  listEvents: (calendarId) ->
+    action = (resolve, reject) -> @sendRequest('/calendars/' + calendarId + '/events/', 'GET', 0, resolve, reject)
+    new Promise(action.bind(@))
 
   ###*
   * Callback, executed when list events successful, data parameter contains list of events.
@@ -516,8 +519,28 @@ class UoACalendarClient
   * );
   ###
 
-  addEvent: (calendarId, event, onSuccess, onError) ->
-    @sendRequest('/calendars/' + calendarId + '/events/', 'POST', event, onSuccess, onError)
+  addEvent: (calendarId, event) ->
+    action = (resolve, reject) -> @sendRequest('/calendars/' + calendarId + '/events/', 'POST', event, resolve, reject)
+    new Promise(action.bind(@))
+
+  addEvents: (calendarId, events) ->
+    action = (resolve, reject) ->
+      numEvents = events.length
+      count = 0
+      i = 0
+      while i < numEvents
+        @addEvent(calendarId, events[i])
+        .then (args) ->
+          count++
+          if count >= numEvents
+            resolve()
+        , (err) ->
+          count++
+          if count >= numEvents
+            reject()
+        i++
+      return
+    new Promise(action.bind(@))
 
   ###*
   * Callback, executed when event added successfully.
@@ -582,8 +605,29 @@ class UoACalendarClient
   * );
   ###
 
-  deleteEvent: (calendarId, eventId, onSuccess, onError) ->
-    @sendRequest('/calendars/' + calendarId + '/events/' + eventId + '/', 'DELETE', 0, onSuccess, onError)
+  deleteEvent: (calendarId, eventId) ->
+    action = (resolve, reject) -> @sendRequest('/calendars/' + calendarId + '/events/' + eventId + '/', 'DELETE', 0, resolve, reject)
+    new Promise(action.bind(@))
+
+  deleteEvents: (calendarId, eventIds) ->
+    action = (resolve, reject) ->
+      numEvents = eventIds.length
+      count = 0
+      i = 0
+      while i < numEvents
+        eventId = eventIds[i]
+        @deleteEvent(calendarId, eventId)
+        .then (args) ->
+          count++
+          if count >= numEvents
+            resolve()
+        , (err) ->
+          count++
+          if count >= numEvents
+            reject()
+        i++
+      return
+    new Promise(action.bind(@))
 
   ###*
   * Callback, executed when event successfully deleted.
@@ -647,8 +691,9 @@ class UoACalendarClient
   * );
   ###
 
-  updateEvent: (calendarId, eventId, event, onSuccess, onError) ->
-    @sendRequest('/calendars/' + calendarId + '/events/' + eventId + '/', 'PATCH', event, onSuccess, onError)
+  updateEvent: (calendarId, eventId, event) ->
+    action = (resolve, reject) -> @sendRequest('/calendars/' + calendarId + '/events/' + eventId + '/', 'PATCH', event, resolve, reject)
+    new Promise(action.bind(@))
 
   ###*
   * Callback, when event updated.
@@ -701,14 +746,13 @@ class UoACalendarClient
   * );
   ###
 
-  findEvents: (calendarId, startDate, endDate, onSuccess, onError) ->
+  findEvents: (calendarId, startDate, endDate) ->
     toUTCString = (date) ->
       return (new Date(date.getTime() + date.getTimezoneOffset() * 60000)).toISOString()
 
-    @sendRequest('/calendars/' + calendarId + '/find_events/', 'GET',
-      {startDate: toUTCString(startDate), endDate: toUTCString(endDate)},
-      onSuccess, onError
-    )
+    action = (resolve, reject) -> @sendRequest('/calendars/' + calendarId + '/find_events/', 'GET',
+      {startDate: toUTCString(startDate), endDate: toUTCString(endDate)}, resolve, reject)
+    new Promise(action.bind(@))
 
   ###*
   * Callback, returns events from a particular calendar within a date range.
