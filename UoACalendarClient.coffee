@@ -160,15 +160,25 @@ class UoACalendarClient
             if data.length != 0
               parsed = JSON.parse(data)
 
-            for k,v of parsed
-              if v.start?
-                v.start = new Date(v.start)
+            if parsed.constructor is Array
+              for k,v of parsed
+                if v.hasOwnProperty('start')
+                  v.start = new Date(v.start)
 
-              if v.end?
-                v.end = new Date(v.end)
+                if v.hasOwnProperty('end')
+                  v.end = new Date(v.end)
 
-              if v.lastUpdate?
-                v.lastUpdate = new Date(v.lastUpdate)
+                if v.hasOwnProperty('lastUpdate')
+                  v.lastUpdate = new Date(v.lastUpdate)
+            else
+                if parsed.hasOwnProperty('start')
+                  parsed.start = new Date(parsed.start)
+
+                if parsed.hasOwnProperty('end')
+                  parsed.end = new Date(parsed.end)
+
+                if parsed.hasOwnProperty('lastUpdate')
+                  parsed.lastUpdate = new Date(parsed.lastUpdate)
 
             onSuccess(res, parsed)
         else
