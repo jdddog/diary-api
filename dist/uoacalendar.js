@@ -614,14 +614,20 @@ UoACalendarClient = (function() {
           data.push(args.data);
           count++;
           if (count >= numEvents) {
-            return resolve(httpResponses, data);
+            return resolve({
+              res: httpResponses,
+              data: data
+            });
           }
         }, function(err) {
           httpResponses.push(args.res);
           data.push(args.data);
           count++;
           if (count >= numEvents) {
-            return reject(httpResponses, data);
+            return reject({
+              res: httpResponses,
+              data: data
+            });
           }
         });
         i++;
@@ -716,14 +722,20 @@ UoACalendarClient = (function() {
           data.push(args.data);
           count++;
           if (count >= numEvents) {
-            return resolve(httpResponses, data);
+            return resolve({
+              res: httpResponses,
+              data: data
+            });
           }
         }, function(err) {
           httpResponses.push(args.res);
           data.push(args.data);
           count++;
           if (count >= numEvents) {
-            return reject(httpResponses, data);
+            return reject({
+              res: httpResponses,
+              data: data
+            });
           }
         });
         i++;
