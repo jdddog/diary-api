@@ -13,7 +13,7 @@ UoACalendarClient = (function() {
   * @type string
   * @default sitcalprd01.its.auckland.ac.nz
    */
-  UoACalendarClient.prototype.DEFAULT_HOST = 'sitcalprd01.its.auckland.ac.nz';
+  UoACalendarClient.prototype.DEFAULT_HOST = 'diaryapi.auckland.ac.nz';
 
 
   /**
@@ -483,7 +483,7 @@ UoACalendarClient = (function() {
   UoACalendarClient.prototype.listEvents = function(calendarId) {
     var action;
     action = function(resolve, reject) {
-      return this.sendRequest('/calendars/' + calendarId + '/events/', 'GET', 0, resolve, reject);
+      return this.sendRequest('/calendars/' + calendarId + '/events/?format=json', 'GET', 0, resolve, reject);
     };
     return new Promise(action.bind(this));
   };
