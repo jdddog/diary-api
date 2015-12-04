@@ -11,7 +11,7 @@ class UoACalendarClient
   * @default sitcalprd01.its.auckland.ac.nz
   ###
 
-  DEFAULT_HOST: 'sitcalprd01.its.auckland.ac.nz'
+  DEFAULT_HOST: 'diaryapi.auckland.ac.nz'
 
   ###*
   * The default TCP port used by the client if no `port` variable is specified during UoACalendarClient instantiation.
@@ -416,7 +416,7 @@ class UoACalendarClient
   ###
 
   listEvents: (calendarId) ->
-    action = (resolve, reject) -> @sendRequest('/calendars/' + calendarId + '/events/', 'GET', 0, resolve, reject)
+    action = (resolve, reject) -> @sendRequest('/calendars/' + calendarId + '/events/?format=json', 'GET', 0, resolve, reject)
     new Promise(action.bind(@))
 
   ###*
