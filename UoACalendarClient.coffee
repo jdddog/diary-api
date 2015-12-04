@@ -537,13 +537,13 @@ class UoACalendarClient
           data.push args.data
           count++
           if count >= numEvents
-            resolve(httpResponses, data)
+            resolve({res: httpResponses, data: data})
         , (err) ->
           httpResponses.push args.res
           data.push args.data
           count++
           if count >= numEvents
-            reject(httpResponses, data)
+            reject({res: httpResponses, data: data})
         i++
       return
     new Promise(action.bind(@))
@@ -630,13 +630,13 @@ class UoACalendarClient
           data.push args.data
           count++
           if count >= numEvents
-            resolve(httpResponses, data)
+            resolve({res: httpResponses, data: data})
         , (err) ->
           httpResponses.push args.res
           data.push args.data
           count++
           if count >= numEvents
-            reject(httpResponses, data)
+            reject({res: httpResponses, data: data})
         i++
       return
     new Promise(action.bind(@))
