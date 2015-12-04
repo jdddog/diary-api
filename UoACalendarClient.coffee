@@ -525,19 +525,25 @@ class UoACalendarClient
 
   addEvents: (calendarId, events) ->
     action = (resolve, reject) ->
+      data = []
+      httpResponses = []
       numEvents = events.length
       count = 0
       i = 0
       while i < numEvents
         @addEvent(calendarId, events[i])
         .then (args) ->
+          httpResponses.push args.res
+          data.push args.data
           count++
           if count >= numEvents
-            resolve()
+            resolve(httpResponses, data)
         , (err) ->
+          httpResponses.push args.res
+          data.push args.data
           count++
           if count >= numEvents
-            reject()
+            reject(httpResponses, data)
         i++
       return
     new Promise(action.bind(@))
@@ -611,6 +617,8 @@ class UoACalendarClient
 
   deleteEvents: (calendarId, eventIds) ->
     action = (resolve, reject) ->
+      data = []
+      httpResponses = []
       numEvents = eventIds.length
       count = 0
       i = 0
@@ -618,13 +626,17 @@ class UoACalendarClient
         eventId = eventIds[i]
         @deleteEvent(calendarId, eventId)
         .then (args) ->
+          httpResponses.push args.res
+          data.push args.data
           count++
           if count >= numEvents
-            resolve()
+            resolve(httpResponses, data)
         , (err) ->
+          httpResponses.push args.res
+          data.push args.data
           count++
           if count >= numEvents
-            reject()
+            reject(httpResponses, data)
         i++
       return
     new Promise(action.bind(@))
