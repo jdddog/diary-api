@@ -11,8 +11,7 @@ The complete documentation for developing with uoacalendar-js is available on th
 uoacalendar-js is implemented with [Coffeescript](http://coffeescript.org/), it has several dependencies which are used to manage the project and compile `UoACalendarClient.coffee` into a standalone browser library.
 
 * [Node.js](https://nodejs.org/en/): npm is used to install dependencies.
-* [browserify](http://browserify.org/): Used to compile `UoACalendarClient.coffee` into standalone browser JavaScript.
-* [coffeeify](https://www.npmjs.com/package/coffeeify): Used to compile `UoACalendarClient.coffee` into standalone browser JavaScript.
+* [browserify](http://browserify.org/) and [coffeeify](https://www.npmjs.com/package/coffeeify): Used to compile `UoACalendarClient.coffee` into standalone browser JavaScript.
 
 The following instructions explain how to setup your development environment. [WebStorm](https://www.jetbrains.com/webstorm/) has been tested with uoacalendar-js, a file watcher is included in the project which compiles Coffeescript into JavaScript.
 
