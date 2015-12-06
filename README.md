@@ -8,13 +8,13 @@ The complete documentation for developing with uoacalendar-js is available here:
 
 ## Development
 
-uoacalendar-js is implemented with [Coffeescript](http://coffeescript.org/); it has several dependencies which are used to manage the project and compile the Coffeescript (`UoACalendarClient.coffee`) into a standalone browser library.
+uoacalendar-js is implemented with [Coffeescript](http://coffeescript.org/), it has several dependencies which are used to manage the project and compile the Coffeescript (`UoACalendarClient.coffee`) into a standalone browser library.
 
 * [Node.js](https://nodejs.org/en/): npm is used to install dependencies.
 * [browserify](http://browserify.org/): Used to compile `UoACalendarClient.coffee` into standalone browser JavaScript.
 * [coffeeify](https://www.npmjs.com/package/coffeeify): Used to compile `UoACalendarClient.coffee` into standalone browser JavaScript.
 
-The following instructions explain how to setup your development environment. The [WebStorm](https://www.jetbrains.com/webstorm/) IDE has been tested with uoacalendar-js; a WebStorm file watcher is included in the project which compiles Coffeescript into JavaScript.
+The following instructions explain how to setup your development environment. The [WebStorm](https://www.jetbrains.com/webstorm/) IDE has been tested with uoacalendar-js, a file watcher is included in the project which compiles Coffeescript into JavaScript.
 
 ### Install Node.js
 
@@ -50,11 +50,11 @@ C:\Users\user\uoacalendar-js>npm install
 
 There are two ways to compile the `UoACalendarClient.coffee` Coffeescript file into JavaScript, in both cases the generated JavaScript file is saved to: `dist/uoacalendar.js`.
 
-1. If using WebStorm, when UoACalendarClient.coffee is saved it is automatically converted into JavaScript via a file watcher. 
+1) If using WebStorm, when UoACalendarClient.coffee is saved it is automatically converted into JavaScript via a file watcher. 
 
 If you opened the project in WebStorm before running `npm install` then you will receive the following error: `An exception occurred while executing watcher 'Compile CoffeeScript'. Watcher has been disabled. Fix it.: Invalid exe`. In this case make sure you have installed the dependnencies with `npm install` and then re-enable the file watcher: File -> Settings -> Tools -> File Watchers -> Tick `Compile CoffeeScript`.
 
-2. If not using WebStorm run the following command (this has only been tested on Linux).
+2) If not using WebStorm run the following command (this has only been tested on Linux).
 
 ```bash
 $ make
