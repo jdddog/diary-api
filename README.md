@@ -56,7 +56,7 @@ If you opened the project in WebStorm before running `npm install` then you will
 2) If not using WebStorm run the following command (this has only been tested on Linux).
 
 ```bash
-$ make
+C:\Users\user\uoacalendar-js> make
 ```
 
 
