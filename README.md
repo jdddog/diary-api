@@ -4,7 +4,7 @@ This project contains the Javascript UoACalendar REST API client library.
 
 ## Documentation
 
-The complete documentation for developing with uoacalendar-js is available here: http://uoa-compsci.github.io/uoacalendar-js/
+The complete documentation for developing with uoacalendar-js is available on the [project website](http://uoa-compsci.github.io/uoacalendar-js/).
 
 ## Development
 
