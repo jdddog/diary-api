@@ -8,13 +8,13 @@ The complete documentation for developing with uoacalendar-js is available here:
 
 ## Development
 
-uoacalendar-js is implemented with [Coffeescript](http://coffeescript.org/), it has several dependencies which are used to manage the project and compile the Coffeescript (`UoACalendarClient.coffee`) into a standalone browser library.
+uoacalendar-js is implemented with [Coffeescript](http://coffeescript.org/), it has several dependencies which are used to manage the project and compile `UoACalendarClient.coffee` into a standalone browser library.
 
 * [Node.js](https://nodejs.org/en/): npm is used to install dependencies.
 * [browserify](http://browserify.org/): Used to compile `UoACalendarClient.coffee` into standalone browser JavaScript.
 * [coffeeify](https://www.npmjs.com/package/coffeeify): Used to compile `UoACalendarClient.coffee` into standalone browser JavaScript.
 
-The following instructions explain how to setup your development environment. The [WebStorm](https://www.jetbrains.com/webstorm/) IDE has been tested with uoacalendar-js, a file watcher is included in the project which compiles Coffeescript into JavaScript.
+The following instructions explain how to setup your development environment. [WebStorm](https://www.jetbrains.com/webstorm/) has been tested with uoacalendar-js, a file watcher is included in the project which compiles Coffeescript into JavaScript.
 
 ### Install Node.js
 
@@ -48,7 +48,7 @@ C:\Users\user\uoacalendar-js>npm install
 
 ### Compile Coffee into JavaScript
 
-There are two ways to compile the `UoACalendarClient.coffee` Coffeescript file into JavaScript, in both cases the generated JavaScript file is saved to: `dist/uoacalendar.js`.
+There are two ways to compile `UoACalendarClient.coffee` into JavaScript, in both cases the generated JavaScript file is saved to: `dist/uoacalendar.js`.
 
 1) If using WebStorm, when UoACalendarClient.coffee is saved it is automatically converted into JavaScript via a file watcher. 
 
