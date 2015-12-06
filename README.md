@@ -12,6 +12,7 @@ uoacalendar-js is implemented with [Coffeescript](http://coffeescript.org/), it 
 
 * [Node.js](https://nodejs.org/en/): npm is used to install dependencies.
 * [browserify](http://browserify.org/) and [coffeeify](https://www.npmjs.com/package/coffeeify): Used to compile `UoACalendarClient.coffee` into a standalone browser JavaScript library.
+* [jsdoc](http://usejsdoc.org/): Generate source code documentation.
 
 The following instructions explain how to setup your development environment. [WebStorm](https://www.jetbrains.com/webstorm/) is the recommended JavaScript IDE to use with the project, a file watcher is included which automatically compiles Coffeescript into JavaScript.
 
@@ -58,6 +59,10 @@ If you opened the project in WebStorm before running `npm install` then you will
 ```bash
 C:\Users\user\uoacalendar-js> make
 ```
+
+### Generating source code documentation
+
+uocalendar-js is documented with [jsdoc](http://usejsdoc.org/).
 
 
 
