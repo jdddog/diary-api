@@ -104,7 +104,7 @@ class UoACalendarClient
   *
   * @param {string} path
   * @param {string} method
-  * @param {string} data
+  * @param {Object} data
   * @param {string} onSuccess
   * @param {string} onError
   * @private
@@ -178,12 +178,12 @@ class UoACalendarClient
             if parsed.hasOwnProperty('lastUpdate')
               parsed.lastUpdate = new Date(parsed.lastUpdate)
 
-          resolve({res: res, data: parsed})
+          resolve(parsed)
         else
           # Server error, I have no idea what happend in the backend
           # but server at least returned correctly (in a HTTP protocol
           # sense) formatted response
-          reject({res: res, data: data})
+          reject({statusCode: res.statusCode, reason: data})
       )
     )
 
@@ -200,21 +200,19 @@ class UoACalendarClient
   ###*
   * Retrieve full list of calendars
   *
-  * @param {onListCalendarsSuccess} onSuccess - Success callback function
-  * @param {onListCalendarsError} onError - Error callback function
-  * @example
-  * client.listCalendars(
-  *   function(res, data) // onSuccess callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   },
-  *   function(res, data) // onError callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   }
-  * );
+  * @returns {Promise.<Array.<{name: string, id: number}>, {statusCode: number, reason: Object}>} A promise that returns an array of calendar JSON objects with name and id key value pairs if resolved or an error if rejected.
+  * @example <caption>Example code</caption>
+  * client.listCalendars().then(function(data){
+  *     console.log(JSON.stringify(data));
+  * }).catch(function(error){
+  *     console.log(JSON.stringify(error));
+  * });
+  *
+  * @example <caption>Example output when calendars successfully received.</caption>
+  * [{"name":"Public holidays","id":1},{"name":"CompSci exam dates","id":2},{"name":"Movie release dates","id":3}]
+  *
+  * @example <caption>Example output when an error has occurred.</caption>
+  * [{"name":"asdasdasdasdasdasd","id":1}]
   ###
 
   listCalendars: () ->
@@ -222,47 +220,27 @@ class UoACalendarClient
       new Promise(action.bind(@))
 
   ###*
-  * Callback, returns an array of calendars.
-  *
-  * @callback onListCalendarsSuccess
-  * @param {HttpResponse} res - HTTP response object.
-  * @param {ErrorMessage} data - An array of calendar JSON objects, with name and id key value pairs.
-  *
-  * @example <caption>Example output</caption>
-  * res: {"offset":5216,"readable":true,"_events":{},"statusCode":200,"headers":{"content-type":"application/json"}}
-  * data: [{"name":"Public holidays","id":1},{"name":"CompSci exam dates","id":2},{"name":"Movie release dates","id":3}]
-  ###
-
-  ###*
-  * Callback function, executed when adding calendar failed.
-  *
-  * @callback onListCalendarsError
-  * @param {HttpResponse} res - HTTP response
-  * @param {ErrorMessage} data - Error message.
-  *
-  * @example <caption>Example output</caption>
-  * todo: insert example
-  ###
-
-  ###*
-  * Retrieve a particular calendar
+  * Retrieve a particular calendar. TODO: return custom fields here.
   * @param {number} id - id of the calendar
-  * @param {onGetCalendarSuccess} onSuccess - Success callback function
-  * @param {onGetCalendarError} onError - Error callback function
-  * @example
+  * @returns {Promise.<Object.<{name: string, id: number}>, Object.<{statusCode: number, reason: Object}>>} A promise that returns calendar with name and id if resolved or an error if rejected.
+  *
+  * @example <caption>Example code</caption>
   * var calendarId = 1;
-  * client.getCalendar(calendarId,
-  *   function(res, data) // onSuccess callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   },
-  *   function(res, data) // onError callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   }
-  * );
+  * client.getCalendar(calendarId).then(function(data){
+  *     console.log(JSON.stringify(data));
+  * }).catch(function(error){
+  *     console.log(JSON.stringify(error));
+  * });
+  *
+  * @example <caption>Example output when a calendar successfully retrieved.</caption>
+  * {"name":"My Calendar","id":84}
+  *
+  * @example <caption>Example output when item doesn't exist.</caption>
+  * {"statusCode":404, "detail": "Not found"}
+  *
+  * @example <caption>Example output when don't have permission to access item.</caption>
+  * {"statusCode":403, "detail": "You do not have permission to perform this action."}
+
   ###
 
   getCalendar: (id) ->
@@ -270,51 +248,21 @@ class UoACalendarClient
     new Promise(action.bind(@))
 
   ###*
-  * Callback, returns particular calendar including its name and id. TODO: return custom fields here.
-  *
-  * @callback onGetCalendarSuccess
-  * @param {HttpResponse} res - HTTP response
-  * @param {Object.<{name: string, id: number}>} data - calendar with name and id
-  *
-  * @example <caption>Example output</caption>
-  * res: {"offset":5216,"readable":true,"_events":{},"statusCode":200,"headers":{"content-type":"application/json"}}
-  * data: {"name":"My Calendar","id":84}
-  ###
-
-  ###*
-  * @callback onGetCalendarError
-  * @param {HttpResponse} res - HTTP response
-  * @param {ErrorMessage} data - detail of what went wrong
-  *
-  * @example <caption>Item doesn't exist</caption>
-  * res: {"offset":22,"readable":true,"_events":{},"statusCode":404,"headers":{"content-type":"application/json"}}
-  * data: {detail: "Not found"}
-  *
-  * @example <caption>No permission to access item</caption>
-  * res: {"offset":63,"readable":true,"_events":{},"statusCode":403,"headers":{"content-type":"application/json"}}
-  * data: {detail: "You do not have permission to perform this action."}
-  ###
-
-  ###*
   * Add a new calendar providing the new calendar's name
   * @param {string} name - Name of calendar
-  * @param {onAddCalendarSuccess} onSuccess - Success callback function
-  * @param {onAddCalendarError} onError - Error callback function
+  * @returns {Promise.<Object.<{name: string, id: number}>, Object.<{statusCode: number, reason: Object}>>} A promise that returns calendar with name and id if resolved or an error if rejected.
   *
-  * @example
-  * var name = "My calendar";
-  * client.addCalendar(name,
-  *   function(res, data) // onSuccess callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   },
-  *   function(res, data) // onError callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   }
-  * );
+  * @example <caption>Example code</caption>
+  * var name = "My new calendar";
+  * client.addCalendar(name).then(function(data){
+  *     console.log(JSON.stringify(data));
+  * }).catch(function(error){
+  *     console.log(JSON.stringify(error));
+  * });
+  *
+  * @example <caption>Example output when calendar successfully added.</caption>
+  * {"name":"My new calendar","id":194}
+  *
   ###
 
   addCalendar: (name) ->
@@ -322,48 +270,20 @@ class UoACalendarClient
     new Promise(action.bind(@))
 
   ###*
-  * Callback function, executed when calendar successfully added.
-  *
-  * @callback onAddCalendarSuccess
-  * @param {HttpResponse} res - HTTP response
-  * @param {Array.<{name: string, id: number}>} data - An array of calendar JSON objects, with name and id key value pairs.
-  *
-  * @example <caption>Example output</caption>
-  * res: {"offset":26,"readable":true,"_events":{},"statusCode":201,"headers":{"content-type":"application/json"}}
-  * data: {"name":"My calendar","id":194}
-  ###
-
-  ###*
-  * Callback function, executed when adding calendar failed.
-  *
-  * @callback onAddCalendarError
-  * @param {HttpResponse} res - HTTP response.
-  * @param {ErrorMessage} data - Error message.
-  *
-  * @example <caption>Example output</caption>
-  * todo: insert example
-  ###
-
-  ###*
   * Delete an existing calendar given its id
   * @param {number} id - id of calendar
-  * @param {onDeleteCalendarSuccess} onSuccess - Success callback function
-  * @param {onDeleteCalendarError} onError - Error callback function
+  * @returns {Promise.<Object, Object.<{statusCode: number, reason: Object}>>} A promise with an empty object if resolved or an error if rejected.
   *
-  * @example
+  * @example <caption>Example code</caption>
   * var calendarId = 1;
-  * client.deleteCalendar(calendarId,
-  *   function(res, data) // onSuccess callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   },
-  *   function(res, data) // onError callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   }
-  * );
+  * client.deleteCalendar(calendarId).then(function(data){
+  *     console.log(JSON.stringify(data));
+  * }).catch(function(error){
+  *     console.log(JSON.stringify(error));
+  * });
+  *
+  * @example <caption>Example output when calendar successfully deleted.</caption>
+  * {}
   ###
 
   deleteCalendar: (id) ->
@@ -371,64 +291,20 @@ class UoACalendarClient
     new Promise(action.bind(@))
 
   ###*
-  * Callback, executed when calendar successfully deleted.
-  *
-  * @callback onDeleteCalendarSuccess
-  * @param {HttpResponse} res - HTTP response
-  * @param {Object.<{}>} data - Empty JSON object
-  *
-  * @example <caption>Example output</caption>
-  * res: {"offset":0,"readable":true,"_events":{},"statusCode":204,"headers":{"content-type":"text/plain; charset=UTF-8"}}
-  * data: {}
-  ###
-
-  ###*
-  * Callback function, executed when delete calendar failed.
-  *
-  * @callback onDeleteCalendarError
-  * @param {HttpResponse} res - HTTP response
-  * @param {ErrorMessage} data - Error message.
-  *
-  * @example <caption>Example output</caption>
-  * todo: insert example
-  ###
-
-  ###*
   * Retrieve the full list of events of an existing calendar given its id
   * @param {number} calendarId - Id of calendar
-  * @param {onListEventsSuccess} onSuccess - Success callback function
-  * @param {onListEventsError} onError - Error callback function
+  * @returns {Promise.<Array.<{id:number, title: string, description: string, start: Date, end: Date, allDay: boolean, url: string, status: string, reminder: string, todo: boolean, location: string, summary: string, lastUpdate: Date}>, Object.<{statusCode: number, reason: Object}>>} A promise that an array of events if resolved or an error if rejected.
   *
   * @example
   * var calendarId = 1;
-  * client.listEvents(calendarId,
-  *   function(res, data) // onSuccess callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   },
-  *   function(res, data) // onError callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   }
-  * );
-  ###
-
-  listEvents: (calendarId) ->
-    action = (resolve, reject) -> @sendRequest('/calendars/' + calendarId + '/events/?format=json', 'GET', 0, resolve, reject)
-    new Promise(action.bind(@))
-
-  ###*
-  * Callback, executed when list events successful, data parameter contains list of events.
+  * client.listEvents(calendarId).then(function(data){
+  *     console.log(JSON.stringify(data));
+  * }).catch(function(error){
+  *     console.log(JSON.stringify(error));
+  * });
   *
-  * @callback onListEventsSuccess
-  * @param {HttpResponse} res - HTTP response
-  * @param {Array.<{id:number, title: string, description: string, start: string, end: string, allDay: boolean, url: string, status: string, reminder: string, todo: boolean, location: string, summary: string, lastUpdate: string}>} data - An array of events
-  *
-  * @example <caption>Example output</caption>
-  * res: {"offset":2,"readable":true,"_events":{},"statusCode":200,"headers":{"content-type":"application/json"}}
-  * data: [{"id":3,"title":"The Force Awakens","description":"","start":"2014-12-18T21:40:00Z","end":"2014-12-18T22:00:00Z",
+  * @example <caption>Example output when events successfully listed.</caption>
+  * [{"id":3,"title":"The Force Awakens","description":"","start":"2014-12-18T21:40:00Z","end":"2014-12-18T22:00:00Z",
   *   "allDay":false,"url":"http://www.starwars.com/the-force-awakens/trailers/","status":null,"reminder":null,
   *   "todo":false,"location":null,"summary":null,"lastUpdate":"2014-12-16T21:26:04Z"},
   *  {"id":5,"title":"HoloLens","description":"","start":"2014-12-17T04:00:00Z","end":"2014-12-17T05:00:00Z",
@@ -436,16 +312,9 @@ class UoACalendarClient
   *   "todo":false,"location":null,"summary":null,"lastUpdate":"2014-12-18T20:54:58Z"}]
   ###
 
-  ###*
-  * Callback function, executed when list events failed.
-  *
-  * @callback onListEventsError
-  * @param {HttpResponse} res - HTTP response
-  * @param {ErrorMessage} data - Error message.
-  *
-  * @example <caption>Example output</caption>
-  * todo: insert example
-  ###
+  listEvents: (calendarId) ->
+    action = (resolve, reject) -> @sendRequest('/calendars/' + calendarId + '/events/?format=json', 'GET', 0, resolve, reject)
+    new Promise(action.bind(@))
 
   ###*
   * Add an event to a particular calendar. Your own data fields can be added to the JSON event object, for
@@ -464,24 +333,16 @@ class UoACalendarClient
   * @param {boolean=} event.todo - Whether event still to be done
   * @param {boolean=} event.allDay - Whether event occurs all day
   * @param {string=} event.url - Event url
-  * @param {onAddEventSuccess} onSuccess - Success callback function
-  * @param {onAddEventError} onError - Error callback function
+  * @returns {Promise.<Object.<{id:number, title: string, description: string, start: Date, end: Date, allDay: boolean, url: string, status: string, reminder: Date, todo: boolean, location: string, summary: string, lastUpdate: string}>, Object.<{statusCode: number, title: string, start: string, detail: string}>>} A promise that contains an event if resolved or an error if rejected.
   *
-  * @example <caption>Minimal example of how to add an event to a calendar, only title is mandatory.</caption>
+  * @example <caption>Minimal example of how to add an event to a calendar, only title and start date are mandatory.</caption>
   * var calendarId = 1;
   * var event = {"title": "Auckland Marathon", "start": new Date(2016, 11, 1, 6, 0, 0)};
-  * client.addEvent(calendarId, event,
-  *   function(res, data) // onSuccess callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   },
-  *   function(res, data) // onError callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   }
-  * );
+  * client.addEvent(calendarId, event).then(function(data){
+  *     console.log(JSON.stringify(data));
+  * }).catch(function(error){
+  *     console.log(JSON.stringify(error));
+  * });
   *
   * @example <caption>Complete example of how to add an event to a calendar.</caption>
   * var calendarId = 1;
@@ -489,34 +350,34 @@ class UoACalendarClient
   *              "location": "King Edward Parade, Devonport", "summary": "Marathon",
   *              "start": new Date(2016, 11, 1, 6, 0, 0), "end": new Date(2016, 11, 1, 8, 30, 0),
   *              "status": "active", "todo": true, "addDay": false, "url": "https://www.aucklandmarathon.co.nz/"};
-  * client.addEvent(calendarId, event,
-  *   function(res, data) // onSuccess callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   },
-  *   function(res, data) // onError callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   }
-  * );
+  * client.addEvent(calendarId, event).then(function(data){
+  *     console.log(JSON.stringify(data));
+  * }).catch(function(error){
+  *     console.log(JSON.stringify(error));
+  * });
   *
   * @example <caption>Example of adding an event with a custom data field. The data field 'exercise' is custom.</caption>
   * var calendarId = 1;
   * var event = {"title": "Auckland Marathon", "start": new Date(2016, 11, 1, 6, 0, 0), "exercise": "run"};
-  * client.addEvent(calendarId, event,
-  *   function(res, data) // onSuccess callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   },
-  *   function(res, data) // onError callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   }
-  * );
+  * client.addEvent(calendarId, event).then(function(data){
+  *     console.log(JSON.stringify(data));
+  * }).catch(function(error){
+  *     console.log(JSON.stringify(error));
+  * });
+  *
+  * @example <caption>Example output when event added successfully</caption>
+  * {"id":2699,"title":"cool event","description":null,"start":"2015-11-17T23:49:18.747000Z","end":null,
+  *     "allDay":false,"url":null,"status":null,"reminder":null,"todo":false,"location":null,"summary":null,
+  *     "lastUpdate":"2015-11-17T23:49:18.899897Z"}
+  *
+  * @example <caption>Example output when title and start date not specified</caption>
+  * {"statusCode":400, "title":"This field is required.", "start":"This field is required."} todo: remove arrays from
+  *
+  * @example <caption>Example output when calendar doesn't exist</caption>
+  * {"statusCode":400, "detail": "Calendar with id -1 doesn't exist"} todo: chang error message
+  *
+  * @example <caption>Example output where date format wrong</caption>
+  * {"statusCode":400, "start":"Datetime has wrong format. Use one of these formats instead: YYYY-MM-DDThh:mm[:ss[.uuuuuu]][+HH:MM|-HH:MM|Z]"}
   ###
 
   addEvent: (calendarId, event) ->
@@ -549,66 +410,23 @@ class UoACalendarClient
     new Promise(action.bind(@))
 
   ###*
-  * Callback, executed when event added successfully.
-  *
-  * @callback onAddEventSuccess
-  * @param {HttpResponse} res - HTTP response
-  * @param {Object.<{id:number, title: string, description: string, start: string, end: string, allDay: boolean, url: string, status: string, reminder: string, todo: boolean, location: string, summary: string, lastUpdate: string}>} data - JSON object with event id
-  *
-  * @example <caption>Example output</caption>
-  * res: {"offset":243,"readable":true,"_events":{},"statusCode":201,"headers":{"content-type":"application/json"}}
-  * data: {"id":2699,"title":"cool event","description":null,"start":"2015-11-17T23:49:18.747000Z","end":null,
-  *        "allDay":false,"url":null,"status":null,"reminder":null,"todo":false,"location":null,"summary":null,
-  *        "lastUpdate":"2015-11-17T23:49:18.899897Z"}
-  ###
-
-  ###*
-  * Callback function, executed when adding an event failed.
-  *
-  * @callback onAddEventError
-  * @param {HttpResponse} res - HTTP response
-  * @param {ErrorMessage} data - Error message.
-  *
-  * @example <caption>Example output when title and start date not specified</caption>
-  * res: {"offset":73,"readable":true,"_events":{},"statusCode":400,"headers":{"content-type":"application/json"}}
-  * data: {"title":"This field is required.", "start":"This field is required."} todo: remove arrays from
-  *
-  * @example <caption>Example output when calendar doesn't exist</caption>
-  * res: {"offset":73,"readable":true,"_events":{},"statusCode":400,"headers":{"content-type":"application/json"}}
-  * data: {detail: "Calendar with id -1 doesn't exist"} todo: chang error message
-  *
-  * @example <caption>Example where date has wrong format</caption>
-  * res: {"offset":122,"readable":true,"_events":{},"statusCode":400,"headers":{"content-type":"application/json"}}
-  * data: {"start":"Datetime has wrong format. Use one of these formats instead: YYYY-MM-DDThh:mm[:ss[.uuuuuu]][+HH:MM|-HH:MM|Z]"}
-  ###
-
-  #add event success
-  #{"offset":37,"readable":true,"_events":{},"statusCode":400,"headers":{"content-type":"application/json"}}
-  #"{\"start\":[\"This field is required.\"]}"
-
-  ###*
   * Delete an existing event from a calendar giving their ids
   *
   * @param {number} calendarId - id of calendar
   * @param {number} eventId - id of event
-  * @param {onDeleteEventSuccess} onSuccess - Success callback function
-  * @param {onDeleteEventError} onError - Error callback function
+  * @returns {Promise.<Object, Object.<{statusCode: number, detail: string}>>} A promise that contains an empty object if resolved or an error if rejected.
   *
   * @example
   * var calendarId = 1;
   * var eventId = 2;
-  * client.deleteEvent(calendarId, eventId,
-  *   function(res, data) // onSuccess callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   },
-  *   function(res, data) // onError callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   }
-  * );
+  * client.deleteEvent(calendarId, eventId).then(function(data){
+  *     console.log(JSON.stringify(data));
+  * }).catch(function(error){
+  *     console.log(JSON.stringify(error));
+  * });
+  *
+  * @example <caption>Example output when event deleted successfully</caption>
+  * {}
   ###
 
   deleteEvent: (calendarId, eventId) ->
@@ -642,31 +460,7 @@ class UoACalendarClient
     new Promise(action.bind(@))
 
   ###*
-  * Callback, executed when event successfully deleted.
-  *
-  * @callback onDeleteEventSuccess
-  * @param {HttpResponse} res - HTTP response
-  * @param {Array} data - empty array
-  *
-  * @example <caption>Example output</caption>
-  * res: {"offset":2,"readable":true,"_events":{},"statusCode":200,"headers":{"content-type":"application/json"}}
-  * data: []
-  ###
-
-  ###*
-  * Callback function, executed when deleting an event failed.
-  *
-  * @callback onDeleteEventError
-  * @param {HttpResponse} res - HTTP response
-  * @param {ErrorMessage} data - Error message.
-  *
-  * @example <caption>Example output</caption>
-  * todo: insert example
-  ###
-
-
-  ###*
-  *  Update an existing event from a calendar giving their IDs
+  *  Update an existing event from a calendar given its id.
   *
   * @param {number} calendarId - id of calendar
   * @param {number} eventId - id of event
@@ -676,31 +470,23 @@ class UoACalendarClient
   * @param {string=} event.location - Event location
   * @param {string=} event.summary - Event summary
   * @param {Date} event.start - Event start date & time
-  * @param {Date=} event.end - Event end date & time
+  * @param {Date} event.end - Event end date & time
   * @param {string=} event.status - Event status
   * @param {string=} event.reminder - Event reminder
   * @param {boolean=} event.todo - Whether event still to be done
   * @param {boolean=} event.allDay - Whether event occurs all day
   * @param {string=} event.url - Event url
-  * @param {onUpdateEventSuccess} onSuccess - Success callback function
-  * @param {onUpdateEventError} onError - Error callback function
+  * @returns {Promise.<Object.<{id:number, title: string, description: string, start: Date, end: Date, allDay: boolean, url: string, status: string, reminder: Date, todo: boolean, location: string, summary: string, lastUpdate: string}>, Object.<{statusCode: number, title: string, start: string, end: string, detail: string}>>} A promise that contains an event if resolved or an error if rejected.
   *
   * @example
   * var calendarId = 1;
   * var eventId = 2;
   * var event = {"title": "Auckland Marathon", "description": "Running the marathon now!"};
-  * client.updateEvent(calendarId, eventId, event,
-  *   function(res, data) // onSuccess callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   },
-  *   function(res, data) // onError callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   }
-  * );
+  * client.updateEvent(calendarId, eventId, event).then(function(data){
+  *     console.log(JSON.stringify(data));
+  * }).catch(function(error){
+  *     console.log(JSON.stringify(error));
+  * });
   ###
 
   updateEvent: (calendarId, eventId, event) ->
@@ -708,54 +494,22 @@ class UoACalendarClient
     new Promise(action.bind(@))
 
   ###*
-  * Callback, when event updated.
-  *
-  * @callback onUpdateEventSuccess
-  * @param {HttpResponse} res - HTTP response
-  * @param {Array.<{}>} data - ?
-  *
-  * @example <caption>Example output</caption>
-  * res: {"offset":0,"readable":true,"_events":{},"statusCode":204,"headers":{"content-type":"text/plain; charset=UTF-8"}}
-  * data: [{},
-  *        {}]
-  ###
-
-  ###*
-  * Callback function, executed event update failed.
-  *
-  * @callback onUpdateEventError
-  * @param {HttpResponse} res - HTTP response
-  * @param {ErrorMessage} data - Error message.
-  *
-  * @example <caption>Example output</caption>
-  * todo: insert example
-  ###
-
-  ###*
   *  Find events from an existing calendar within a given time range
   *
   * @param {number} calendarId - id of calendar
   * @param {Date} startDate - date to begin searching
   * @param {Date} endDate - date to stop searching
-  * @param {onFindEventsSuccess} onSuccess - Success callback function
-  * @param {onFindEventsError} onError - Error callback function
+  * @returns {Promise.<Array.<{id:number, title: string, description: string, start: Date, end: Date, allDay: boolean, url: string, status: string, reminder: Date, todo: boolean, location: string, summary: string, lastUpdate: string}>, Object.<{statusCode: number, detail: string}>>} A promise that contains an array of events if resolved or an error if rejected.
   *
   * @example <caption>Find all events in calendar 1 between the day star wars first screened and now.</caption>
   * var calendarId = 1;
   * var startDate = new Date(1977, 5, 25); //date star wars first screened!
   * var endDate = new Date(); //current date and time
-  * client.findEvents(calendarId, startDate, endDate,
-  *   function(res, data) // onSuccess callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   },
-  *   function(res, data) // onError callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   }
-  * );
+  * client.findEvents(calendarId, startDate, endDate).then(function(data){
+  *     console.log(JSON.stringify(data));
+  * }).catch(function(error){
+  *     console.log(JSON.stringify(error));
+  * });
   ###
 
   findEvents: (calendarId, startDate, endDate) ->
@@ -765,51 +519,6 @@ class UoACalendarClient
     action = (resolve, reject) -> @sendRequest('/calendars/' + calendarId + '/find_events/', 'GET',
       {startDate: toUTCString(startDate), endDate: toUTCString(endDate)}, resolve, reject)
     new Promise(action.bind(@))
-
-  ###*
-  * Callback, returns events from a particular calendar within a date range.
-  *
-  * @callback onFindEventsSuccess
-  * @param {HttpResponse} res - HTTP response
-  * @param {Array.<{}>} data - Array of events
-  *
-  * @example <caption>Example output</caption>
-  * res: {"offset":0,"readable":true,"_events":{},"statusCode":204,"headers":{"content-type":"text/plain; charset=UTF-8"}}
-  * data: [{},
-  *        {}]
-  ###
-
-  ###*
-  * Callback function, executed when finding events failed.
-  *
-  * @callback onFindEventsError
-  * @param {HttpResponse} res - HTTP response
-  * @param {ErrorMessage} data - Error message.
-  *
-  * @example <caption>Example output</caption>
-  * todo: insert example
-  ###
-
-  ###*
-  * @typedef {Object} HttpResponse
-  * @property {number} offset -
-  * @property {boolean} readable -
-  * @property {number} statusCode - See [HTTP status codes]{@link https://en.wikipedia.org/wiki/List_of_HTTP_status_codes}
-  * @property {Object} headers -
-  * @property {string} headers.content-type -
-  *
-  * @example
-  * {"offset":30,"readable":true,"_events":{},"statusCode":200,"headers":{"content-type":"application/json"}}
-  ###
-
-  ###*
-  *
-  * @typedef {Object} ErrorMessage
-  * @property {string} detail - Reason for error.
-  *
-  * @example
-  * {detail: "You do not have permission to perform this action."}
-  ###
 
 exports.UoACalendarClient = UoACalendarClient
 

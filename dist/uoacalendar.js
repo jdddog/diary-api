@@ -116,7 +116,7 @@ UoACalendarClient = (function() {
   *
   * @param {string} path
   * @param {string} method
-  * @param {string} data
+  * @param {Object} data
   * @param {string} onSuccess
   * @param {string} onError
   * @private
@@ -207,14 +207,11 @@ UoACalendarClient = (function() {
               parsed.lastUpdate = new Date(parsed.lastUpdate);
             }
           }
-          return resolve({
-            res: res,
-            data: parsed
-          });
+          return resolve(parsed);
         } else {
           return reject({
-            res: res,
-            data: data
+            statusCode: res.statusCode,
+            reason: data
           });
         }
       });
@@ -235,21 +232,19 @@ UoACalendarClient = (function() {
   /**
   * Retrieve full list of calendars
   *
-  * @param {onListCalendarsSuccess} onSuccess - Success callback function
-  * @param {onListCalendarsError} onError - Error callback function
-  * @example
-  * client.listCalendars(
-  *   function(res, data) // onSuccess callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   },
-  *   function(res, data) // onError callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   }
-  * );
+  * @returns {Promise.<Array.<{name: string, id: number}>, {statusCode: number, reason: Object}>} A promise that returns an array of calendar JSON objects with name and id key value pairs if resolved or an error if rejected.
+  * @example <caption>Example code</caption>
+  * client.listCalendars().then(function(data){
+  *     console.log(JSON.stringify(data));
+  * }).catch(function(error){
+  *     console.log(JSON.stringify(error));
+  * });
+  *
+  * @example <caption>Example output when calendars successfully received.</caption>
+  * [{"name":"Public holidays","id":1},{"name":"CompSci exam dates","id":2},{"name":"Movie release dates","id":3}]
+  *
+  * @example <caption>Example output when an error has occurred.</caption>
+  * [{"name":"asdasdasdasdasdasd","id":1}]
    */
 
   UoACalendarClient.prototype.listCalendars = function() {
@@ -262,49 +257,26 @@ UoACalendarClient = (function() {
 
 
   /**
-  * Callback, returns an array of calendars.
-  *
-  * @callback onListCalendarsSuccess
-  * @param {HttpResponse} res - HTTP response object.
-  * @param {ErrorMessage} data - An array of calendar JSON objects, with name and id key value pairs.
-  *
-  * @example <caption>Example output</caption>
-  * res: {"offset":5216,"readable":true,"_events":{},"statusCode":200,"headers":{"content-type":"application/json"}}
-  * data: [{"name":"Public holidays","id":1},{"name":"CompSci exam dates","id":2},{"name":"Movie release dates","id":3}]
-   */
-
-
-  /**
-  * Callback function, executed when adding calendar failed.
-  *
-  * @callback onListCalendarsError
-  * @param {HttpResponse} res - HTTP response
-  * @param {ErrorMessage} data - Error message.
-  *
-  * @example <caption>Example output</caption>
-  * todo: insert example
-   */
-
-
-  /**
-  * Retrieve a particular calendar
+  * Retrieve a particular calendar. TODO: return custom fields here.
   * @param {number} id - id of the calendar
-  * @param {onGetCalendarSuccess} onSuccess - Success callback function
-  * @param {onGetCalendarError} onError - Error callback function
-  * @example
+  * @returns {Promise.<Object.<{name: string, id: number}>, Object.<{statusCode: number, reason: Object}>>} A promise that returns calendar with name and id if resolved or an error if rejected.
+  *
+  * @example <caption>Example code</caption>
   * var calendarId = 1;
-  * client.getCalendar(calendarId,
-  *   function(res, data) // onSuccess callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   },
-  *   function(res, data) // onError callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   }
-  * );
+  * client.getCalendar(calendarId).then(function(data){
+  *     console.log(JSON.stringify(data));
+  * }).catch(function(error){
+  *     console.log(JSON.stringify(error));
+  * });
+  *
+  * @example <caption>Example output when a calendar successfully retrieved.</caption>
+  * {"name":"My Calendar","id":84}
+  *
+  * @example <caption>Example output when item doesn't exist.</caption>
+  * {"statusCode":404, "detail": "Not found"}
+  *
+  * @example <caption>Example output when don't have permission to access item.</caption>
+  * {"statusCode":403, "detail": "You do not have permission to perform this action."}
    */
 
   UoACalendarClient.prototype.getCalendar = function(id) {
@@ -317,53 +289,21 @@ UoACalendarClient = (function() {
 
 
   /**
-  * Callback, returns particular calendar including its name and id. TODO: return custom fields here.
-  *
-  * @callback onGetCalendarSuccess
-  * @param {HttpResponse} res - HTTP response
-  * @param {Object.<{name: string, id: number}>} data - calendar with name and id
-  *
-  * @example <caption>Example output</caption>
-  * res: {"offset":5216,"readable":true,"_events":{},"statusCode":200,"headers":{"content-type":"application/json"}}
-  * data: {"name":"My Calendar","id":84}
-   */
-
-
-  /**
-  * @callback onGetCalendarError
-  * @param {HttpResponse} res - HTTP response
-  * @param {ErrorMessage} data - detail of what went wrong
-  *
-  * @example <caption>Item doesn't exist</caption>
-  * res: {"offset":22,"readable":true,"_events":{},"statusCode":404,"headers":{"content-type":"application/json"}}
-  * data: {detail: "Not found"}
-  *
-  * @example <caption>No permission to access item</caption>
-  * res: {"offset":63,"readable":true,"_events":{},"statusCode":403,"headers":{"content-type":"application/json"}}
-  * data: {detail: "You do not have permission to perform this action."}
-   */
-
-
-  /**
   * Add a new calendar providing the new calendar's name
   * @param {string} name - Name of calendar
-  * @param {onAddCalendarSuccess} onSuccess - Success callback function
-  * @param {onAddCalendarError} onError - Error callback function
+  * @returns {Promise.<Object.<{name: string, id: number}>, Object.<{statusCode: number, reason: Object}>>} A promise that returns calendar with name and id if resolved or an error if rejected.
   *
-  * @example
-  * var name = "My calendar";
-  * client.addCalendar(name,
-  *   function(res, data) // onSuccess callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   },
-  *   function(res, data) // onError callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   }
-  * );
+  * @example <caption>Example code</caption>
+  * var name = "My new calendar";
+  * client.addCalendar(name).then(function(data){
+  *     console.log(JSON.stringify(data));
+  * }).catch(function(error){
+  *     console.log(JSON.stringify(error));
+  * });
+  *
+  * @example <caption>Example output when calendar successfully added.</caption>
+  * {"name":"My new calendar","id":194}
+  *
    */
 
   UoACalendarClient.prototype.addCalendar = function(name) {
@@ -378,50 +318,20 @@ UoACalendarClient = (function() {
 
 
   /**
-  * Callback function, executed when calendar successfully added.
-  *
-  * @callback onAddCalendarSuccess
-  * @param {HttpResponse} res - HTTP response
-  * @param {Array.<{name: string, id: number}>} data - An array of calendar JSON objects, with name and id key value pairs.
-  *
-  * @example <caption>Example output</caption>
-  * res: {"offset":26,"readable":true,"_events":{},"statusCode":201,"headers":{"content-type":"application/json"}}
-  * data: {"name":"My calendar","id":194}
-   */
-
-
-  /**
-  * Callback function, executed when adding calendar failed.
-  *
-  * @callback onAddCalendarError
-  * @param {HttpResponse} res - HTTP response.
-  * @param {ErrorMessage} data - Error message.
-  *
-  * @example <caption>Example output</caption>
-  * todo: insert example
-   */
-
-
-  /**
   * Delete an existing calendar given its id
   * @param {number} id - id of calendar
-  * @param {onDeleteCalendarSuccess} onSuccess - Success callback function
-  * @param {onDeleteCalendarError} onError - Error callback function
+  * @returns {Promise.<Object, Object.<{statusCode: number, reason: Object}>>} A promise with an empty object if resolved or an error if rejected.
   *
-  * @example
+  * @example <caption>Example code</caption>
   * var calendarId = 1;
-  * client.deleteCalendar(calendarId,
-  *   function(res, data) // onSuccess callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   },
-  *   function(res, data) // onError callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   }
-  * );
+  * client.deleteCalendar(calendarId).then(function(data){
+  *     console.log(JSON.stringify(data));
+  * }).catch(function(error){
+  *     console.log(JSON.stringify(error));
+  * });
+  *
+  * @example <caption>Example output when calendar successfully deleted.</caption>
+  * {}
    */
 
   UoACalendarClient.prototype.deleteCalendar = function(id) {
@@ -434,50 +344,25 @@ UoACalendarClient = (function() {
 
 
   /**
-  * Callback, executed when calendar successfully deleted.
-  *
-  * @callback onDeleteCalendarSuccess
-  * @param {HttpResponse} res - HTTP response
-  * @param {Object.<{}>} data - Empty JSON object
-  *
-  * @example <caption>Example output</caption>
-  * res: {"offset":0,"readable":true,"_events":{},"statusCode":204,"headers":{"content-type":"text/plain; charset=UTF-8"}}
-  * data: {}
-   */
-
-
-  /**
-  * Callback function, executed when delete calendar failed.
-  *
-  * @callback onDeleteCalendarError
-  * @param {HttpResponse} res - HTTP response
-  * @param {ErrorMessage} data - Error message.
-  *
-  * @example <caption>Example output</caption>
-  * todo: insert example
-   */
-
-
-  /**
   * Retrieve the full list of events of an existing calendar given its id
   * @param {number} calendarId - Id of calendar
-  * @param {onListEventsSuccess} onSuccess - Success callback function
-  * @param {onListEventsError} onError - Error callback function
+  * @returns {Promise.<Array.<{id:number, title: string, description: string, start: Date, end: Date, allDay: boolean, url: string, status: string, reminder: string, todo: boolean, location: string, summary: string, lastUpdate: Date}>, Object.<{statusCode: number, reason: Object}>>} A promise that an array of events if resolved or an error if rejected.
   *
   * @example
   * var calendarId = 1;
-  * client.listEvents(calendarId,
-  *   function(res, data) // onSuccess callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   },
-  *   function(res, data) // onError callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   }
-  * );
+  * client.listEvents(calendarId).then(function(data){
+  *     console.log(JSON.stringify(data));
+  * }).catch(function(error){
+  *     console.log(JSON.stringify(error));
+  * });
+  *
+  * @example <caption>Example output when events successfully listed.</caption>
+  * [{"id":3,"title":"The Force Awakens","description":"","start":"2014-12-18T21:40:00Z","end":"2014-12-18T22:00:00Z",
+  *   "allDay":false,"url":"http://www.starwars.com/the-force-awakens/trailers/","status":null,"reminder":null,
+  *   "todo":false,"location":null,"summary":null,"lastUpdate":"2014-12-16T21:26:04Z"},
+  *  {"id":5,"title":"HoloLens","description":"","start":"2014-12-17T04:00:00Z","end":"2014-12-17T05:00:00Z",
+  *   "allDay":false,"url":"http://www.microsoft.com/microsoft-hololens/en-us","status":null,"reminder":null,
+  *   "todo":false,"location":null,"summary":null,"lastUpdate":"2014-12-18T20:54:58Z"}]
    */
 
   UoACalendarClient.prototype.listEvents = function(calendarId) {
@@ -487,36 +372,6 @@ UoACalendarClient = (function() {
     };
     return new Promise(action.bind(this));
   };
-
-
-  /**
-  * Callback, executed when list events successful, data parameter contains list of events.
-  *
-  * @callback onListEventsSuccess
-  * @param {HttpResponse} res - HTTP response
-  * @param {Array.<{id:number, title: string, description: string, start: string, end: string, allDay: boolean, url: string, status: string, reminder: string, todo: boolean, location: string, summary: string, lastUpdate: string}>} data - An array of events
-  *
-  * @example <caption>Example output</caption>
-  * res: {"offset":2,"readable":true,"_events":{},"statusCode":200,"headers":{"content-type":"application/json"}}
-  * data: [{"id":3,"title":"The Force Awakens","description":"","start":"2014-12-18T21:40:00Z","end":"2014-12-18T22:00:00Z",
-  *   "allDay":false,"url":"http://www.starwars.com/the-force-awakens/trailers/","status":null,"reminder":null,
-  *   "todo":false,"location":null,"summary":null,"lastUpdate":"2014-12-16T21:26:04Z"},
-  *  {"id":5,"title":"HoloLens","description":"","start":"2014-12-17T04:00:00Z","end":"2014-12-17T05:00:00Z",
-  *   "allDay":false,"url":"http://www.microsoft.com/microsoft-hololens/en-us","status":null,"reminder":null,
-  *   "todo":false,"location":null,"summary":null,"lastUpdate":"2014-12-18T20:54:58Z"}]
-   */
-
-
-  /**
-  * Callback function, executed when list events failed.
-  *
-  * @callback onListEventsError
-  * @param {HttpResponse} res - HTTP response
-  * @param {ErrorMessage} data - Error message.
-  *
-  * @example <caption>Example output</caption>
-  * todo: insert example
-   */
 
 
   /**
@@ -536,24 +391,16 @@ UoACalendarClient = (function() {
   * @param {boolean=} event.todo - Whether event still to be done
   * @param {boolean=} event.allDay - Whether event occurs all day
   * @param {string=} event.url - Event url
-  * @param {onAddEventSuccess} onSuccess - Success callback function
-  * @param {onAddEventError} onError - Error callback function
+  * @returns {Promise.<Object.<{id:number, title: string, description: string, start: Date, end: Date, allDay: boolean, url: string, status: string, reminder: Date, todo: boolean, location: string, summary: string, lastUpdate: string}>, Object.<{statusCode: number, title: string, start: string, detail: string}>>} A promise that contains an event if resolved or an error if rejected.
   *
-  * @example <caption>Minimal example of how to add an event to a calendar, only title is mandatory.</caption>
+  * @example <caption>Minimal example of how to add an event to a calendar, only title and start date are mandatory.</caption>
   * var calendarId = 1;
   * var event = {"title": "Auckland Marathon", "start": new Date(2016, 11, 1, 6, 0, 0)};
-  * client.addEvent(calendarId, event,
-  *   function(res, data) // onSuccess callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   },
-  *   function(res, data) // onError callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   }
-  * );
+  * client.addEvent(calendarId, event).then(function(data){
+  *     console.log(JSON.stringify(data));
+  * }).catch(function(error){
+  *     console.log(JSON.stringify(error));
+  * });
   *
   * @example <caption>Complete example of how to add an event to a calendar.</caption>
   * var calendarId = 1;
@@ -561,34 +408,34 @@ UoACalendarClient = (function() {
   *              "location": "King Edward Parade, Devonport", "summary": "Marathon",
   *              "start": new Date(2016, 11, 1, 6, 0, 0), "end": new Date(2016, 11, 1, 8, 30, 0),
   *              "status": "active", "todo": true, "addDay": false, "url": "https://www.aucklandmarathon.co.nz/"};
-  * client.addEvent(calendarId, event,
-  *   function(res, data) // onSuccess callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   },
-  *   function(res, data) // onError callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   }
-  * );
+  * client.addEvent(calendarId, event).then(function(data){
+  *     console.log(JSON.stringify(data));
+  * }).catch(function(error){
+  *     console.log(JSON.stringify(error));
+  * });
   *
   * @example <caption>Example of adding an event with a custom data field. The data field 'exercise' is custom.</caption>
   * var calendarId = 1;
   * var event = {"title": "Auckland Marathon", "start": new Date(2016, 11, 1, 6, 0, 0), "exercise": "run"};
-  * client.addEvent(calendarId, event,
-  *   function(res, data) // onSuccess callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   },
-  *   function(res, data) // onError callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   }
-  * );
+  * client.addEvent(calendarId, event).then(function(data){
+  *     console.log(JSON.stringify(data));
+  * }).catch(function(error){
+  *     console.log(JSON.stringify(error));
+  * });
+  *
+  * @example <caption>Example output when event added successfully</caption>
+  * {"id":2699,"title":"cool event","description":null,"start":"2015-11-17T23:49:18.747000Z","end":null,
+  *     "allDay":false,"url":null,"status":null,"reminder":null,"todo":false,"location":null,"summary":null,
+  *     "lastUpdate":"2015-11-17T23:49:18.899897Z"}
+  *
+  * @example <caption>Example output when title and start date not specified</caption>
+  * {"statusCode":400, "title":"This field is required.", "start":"This field is required."} todo: remove arrays from
+  *
+  * @example <caption>Example output when calendar doesn't exist</caption>
+  * {"statusCode":400, "detail": "Calendar with id -1 doesn't exist"} todo: chang error message
+  *
+  * @example <caption>Example output where date format wrong</caption>
+  * {"statusCode":400, "start":"Datetime has wrong format. Use one of these formats instead: YYYY-MM-DDThh:mm[:ss[.uuuuuu]][+HH:MM|-HH:MM|Z]"}
    */
 
   UoACalendarClient.prototype.addEvent = function(calendarId, event) {
@@ -638,64 +485,23 @@ UoACalendarClient = (function() {
 
 
   /**
-  * Callback, executed when event added successfully.
-  *
-  * @callback onAddEventSuccess
-  * @param {HttpResponse} res - HTTP response
-  * @param {Object.<{id:number, title: string, description: string, start: string, end: string, allDay: boolean, url: string, status: string, reminder: string, todo: boolean, location: string, summary: string, lastUpdate: string}>} data - JSON object with event id
-  *
-  * @example <caption>Example output</caption>
-  * res: {"offset":243,"readable":true,"_events":{},"statusCode":201,"headers":{"content-type":"application/json"}}
-  * data: {"id":2699,"title":"cool event","description":null,"start":"2015-11-17T23:49:18.747000Z","end":null,
-  *        "allDay":false,"url":null,"status":null,"reminder":null,"todo":false,"location":null,"summary":null,
-  *        "lastUpdate":"2015-11-17T23:49:18.899897Z"}
-   */
-
-
-  /**
-  * Callback function, executed when adding an event failed.
-  *
-  * @callback onAddEventError
-  * @param {HttpResponse} res - HTTP response
-  * @param {ErrorMessage} data - Error message.
-  *
-  * @example <caption>Example output when title and start date not specified</caption>
-  * res: {"offset":73,"readable":true,"_events":{},"statusCode":400,"headers":{"content-type":"application/json"}}
-  * data: {"title":"This field is required.", "start":"This field is required."} todo: remove arrays from
-  *
-  * @example <caption>Example output when calendar doesn't exist</caption>
-  * res: {"offset":73,"readable":true,"_events":{},"statusCode":400,"headers":{"content-type":"application/json"}}
-  * data: {detail: "Calendar with id -1 doesn't exist"} todo: chang error message
-  *
-  * @example <caption>Example where date has wrong format</caption>
-  * res: {"offset":122,"readable":true,"_events":{},"statusCode":400,"headers":{"content-type":"application/json"}}
-  * data: {"start":"Datetime has wrong format. Use one of these formats instead: YYYY-MM-DDThh:mm[:ss[.uuuuuu]][+HH:MM|-HH:MM|Z]"}
-   */
-
-
-  /**
   * Delete an existing event from a calendar giving their ids
   *
   * @param {number} calendarId - id of calendar
   * @param {number} eventId - id of event
-  * @param {onDeleteEventSuccess} onSuccess - Success callback function
-  * @param {onDeleteEventError} onError - Error callback function
+  * @returns {Promise.<Object, Object.<{statusCode: number, detail: string}>>} A promise that contains an empty object if resolved or an error if rejected.
   *
   * @example
   * var calendarId = 1;
   * var eventId = 2;
-  * client.deleteEvent(calendarId, eventId,
-  *   function(res, data) // onSuccess callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   },
-  *   function(res, data) // onError callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   }
-  * );
+  * client.deleteEvent(calendarId, eventId).then(function(data){
+  *     console.log(JSON.stringify(data));
+  * }).catch(function(error){
+  *     console.log(JSON.stringify(error));
+  * });
+  *
+  * @example <caption>Example output when event deleted successfully</caption>
+  * {}
    */
 
   UoACalendarClient.prototype.deleteEvent = function(calendarId, eventId) {
@@ -746,32 +552,7 @@ UoACalendarClient = (function() {
 
 
   /**
-  * Callback, executed when event successfully deleted.
-  *
-  * @callback onDeleteEventSuccess
-  * @param {HttpResponse} res - HTTP response
-  * @param {Array} data - empty array
-  *
-  * @example <caption>Example output</caption>
-  * res: {"offset":2,"readable":true,"_events":{},"statusCode":200,"headers":{"content-type":"application/json"}}
-  * data: []
-   */
-
-
-  /**
-  * Callback function, executed when deleting an event failed.
-  *
-  * @callback onDeleteEventError
-  * @param {HttpResponse} res - HTTP response
-  * @param {ErrorMessage} data - Error message.
-  *
-  * @example <caption>Example output</caption>
-  * todo: insert example
-   */
-
-
-  /**
-  *  Update an existing event from a calendar giving their IDs
+  *  Update an existing event from a calendar given its id.
   *
   * @param {number} calendarId - id of calendar
   * @param {number} eventId - id of event
@@ -781,31 +562,23 @@ UoACalendarClient = (function() {
   * @param {string=} event.location - Event location
   * @param {string=} event.summary - Event summary
   * @param {Date} event.start - Event start date & time
-  * @param {Date=} event.end - Event end date & time
+  * @param {Date} event.end - Event end date & time
   * @param {string=} event.status - Event status
   * @param {string=} event.reminder - Event reminder
   * @param {boolean=} event.todo - Whether event still to be done
   * @param {boolean=} event.allDay - Whether event occurs all day
   * @param {string=} event.url - Event url
-  * @param {onUpdateEventSuccess} onSuccess - Success callback function
-  * @param {onUpdateEventError} onError - Error callback function
+  * @returns {Promise.<Object.<{id:number, title: string, description: string, start: Date, end: Date, allDay: boolean, url: string, status: string, reminder: Date, todo: boolean, location: string, summary: string, lastUpdate: string}>, Object.<{statusCode: number, title: string, start: string, end: string, detail: string}>>} A promise that contains an event if resolved or an error if rejected.
   *
   * @example
   * var calendarId = 1;
   * var eventId = 2;
   * var event = {"title": "Auckland Marathon", "description": "Running the marathon now!"};
-  * client.updateEvent(calendarId, eventId, event,
-  *   function(res, data) // onSuccess callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   },
-  *   function(res, data) // onError callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   }
-  * );
+  * client.updateEvent(calendarId, eventId, event).then(function(data){
+  *     console.log(JSON.stringify(data));
+  * }).catch(function(error){
+  *     console.log(JSON.stringify(error));
+  * });
    */
 
   UoACalendarClient.prototype.updateEvent = function(calendarId, eventId, event) {
@@ -818,56 +591,22 @@ UoACalendarClient = (function() {
 
 
   /**
-  * Callback, when event updated.
-  *
-  * @callback onUpdateEventSuccess
-  * @param {HttpResponse} res - HTTP response
-  * @param {Array.<{}>} data - ?
-  *
-  * @example <caption>Example output</caption>
-  * res: {"offset":0,"readable":true,"_events":{},"statusCode":204,"headers":{"content-type":"text/plain; charset=UTF-8"}}
-  * data: [{},
-  *        {}]
-   */
-
-
-  /**
-  * Callback function, executed event update failed.
-  *
-  * @callback onUpdateEventError
-  * @param {HttpResponse} res - HTTP response
-  * @param {ErrorMessage} data - Error message.
-  *
-  * @example <caption>Example output</caption>
-  * todo: insert example
-   */
-
-
-  /**
   *  Find events from an existing calendar within a given time range
   *
   * @param {number} calendarId - id of calendar
   * @param {Date} startDate - date to begin searching
   * @param {Date} endDate - date to stop searching
-  * @param {onFindEventsSuccess} onSuccess - Success callback function
-  * @param {onFindEventsError} onError - Error callback function
+  * @returns {Promise.<Array.<{id:number, title: string, description: string, start: Date, end: Date, allDay: boolean, url: string, status: string, reminder: Date, todo: boolean, location: string, summary: string, lastUpdate: string}>, Object.<{statusCode: number, detail: string}>>} A promise that contains an array of events if resolved or an error if rejected.
   *
   * @example <caption>Find all events in calendar 1 between the day star wars first screened and now.</caption>
   * var calendarId = 1;
   * var startDate = new Date(1977, 5, 25); //date star wars first screened!
   * var endDate = new Date(); //current date and time
-  * client.findEvents(calendarId, startDate, endDate,
-  *   function(res, data) // onSuccess callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   },
-  *   function(res, data) // onError callback
-  *   {
-  *     console.log(res);
-  *     console.log(data);
-  *   }
-  * );
+  * client.findEvents(calendarId, startDate, endDate).then(function(data){
+  *     console.log(JSON.stringify(data));
+  * }).catch(function(error){
+  *     console.log(JSON.stringify(error));
+  * });
    */
 
   UoACalendarClient.prototype.findEvents = function(calendarId, startDate, endDate) {
@@ -884,55 +623,6 @@ UoACalendarClient = (function() {
     return new Promise(action.bind(this));
   };
 
-
-  /**
-  * Callback, returns events from a particular calendar within a date range.
-  *
-  * @callback onFindEventsSuccess
-  * @param {HttpResponse} res - HTTP response
-  * @param {Array.<{}>} data - Array of events
-  *
-  * @example <caption>Example output</caption>
-  * res: {"offset":0,"readable":true,"_events":{},"statusCode":204,"headers":{"content-type":"text/plain; charset=UTF-8"}}
-  * data: [{},
-  *        {}]
-   */
-
-
-  /**
-  * Callback function, executed when finding events failed.
-  *
-  * @callback onFindEventsError
-  * @param {HttpResponse} res - HTTP response
-  * @param {ErrorMessage} data - Error message.
-  *
-  * @example <caption>Example output</caption>
-  * todo: insert example
-   */
-
-
-  /**
-  * @typedef {Object} HttpResponse
-  * @property {number} offset -
-  * @property {boolean} readable -
-  * @property {number} statusCode - See [HTTP status codes]{@link https://en.wikipedia.org/wiki/List_of_HTTP_status_codes}
-  * @property {Object} headers -
-  * @property {string} headers.content-type -
-  *
-  * @example
-  * {"offset":30,"readable":true,"_events":{},"statusCode":200,"headers":{"content-type":"application/json"}}
-   */
-
-
-  /**
-  *
-  * @typedef {Object} ErrorMessage
-  * @property {string} detail - Reason for error.
-  *
-  * @example
-  * {detail: "You do not have permission to perform this action."}
-   */
-
   return UoACalendarClient;
 
 })();
@@ -944,7 +634,7 @@ module.exports = function(apiToken, host, port) {
 };
 
 
-},{"http":30}],2:[function(require,module,exports){
+},{"http":29}],2:[function(require,module,exports){
 
 },{}],3:[function(require,module,exports){
 (function (global){
@@ -958,7 +648,7 @@ module.exports = function(apiToken, host, port) {
 
 var base64 = require('base64-js')
 var ieee754 = require('ieee754')
-var isArray = require('is-array')
+var isArray = require('isarray')
 
 exports.Buffer = Buffer
 exports.SlowBuffer = SlowBuffer
@@ -2494,7 +2184,7 @@ function blitBuffer (src, dst, offset, length) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"base64-js":4,"ieee754":5,"is-array":6}],4:[function(require,module,exports){
+},{"base64-js":4,"ieee754":5,"isarray":9}],4:[function(require,module,exports){
 var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
 ;(function (exports) {
@@ -2707,41 +2397,6 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 }
 
 },{}],6:[function(require,module,exports){
-
-/**
- * isArray
- */
-
-var isArray = Array.isArray;
-
-/**
- * toString
- */
-
-var str = Object.prototype.toString;
-
-/**
- * Whether or not the given `val`
- * is an array.
- *
- * example:
- *
- *        isArray([]);
- *        // > true
- *        isArray(arguments);
- *        // > false
- *        isArray('');
- *        // > false
- *
- * @param {mixed} val
- * @return {bool}
- */
-
-module.exports = isArray || function (val) {
-  return !! val && '[object Array]' == str.call(val);
-};
-
-},{}],7:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -3041,7 +2696,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],8:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -3066,7 +2721,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],9:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 /**
  * Determine if an object is Buffer
  *
@@ -3085,12 +2740,12 @@ module.exports = function (obj) {
     ))
 }
 
-},{}],10:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 module.exports = Array.isArray || function (arr) {
   return Object.prototype.toString.call(arr) == '[object Array]';
 };
 
-},{}],11:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -3183,7 +2838,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],12:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 (function (global){
 /*! https://mths.be/punycode v1.3.2 by @mathias */
 ;(function(root) {
@@ -3717,7 +3372,7 @@ process.umask = function() { return 0; };
 }(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],13:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -3803,7 +3458,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],14:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -3890,16 +3545,16 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],15:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":13,"./encode":14}],16:[function(require,module,exports){
+},{"./decode":12,"./encode":13}],15:[function(require,module,exports){
 module.exports = require("./lib/_stream_duplex.js")
 
-},{"./lib/_stream_duplex.js":17}],17:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":16}],16:[function(require,module,exports){
 // a duplex stream is just a stream that is both readable and writable.
 // Since JS doesn't have multiple prototypal inheritance, this class
 // prototypally inherits from Readable, and then parasitically from
@@ -3983,7 +3638,7 @@ function forEach (xs, f) {
   }
 }
 
-},{"./_stream_readable":19,"./_stream_writable":21,"core-util-is":22,"inherits":8,"process-nextick-args":23}],18:[function(require,module,exports){
+},{"./_stream_readable":18,"./_stream_writable":20,"core-util-is":21,"inherits":7,"process-nextick-args":22}],17:[function(require,module,exports){
 // a passthrough stream.
 // basically just the most minimal sort of Transform stream.
 // Every written chunk gets output as-is.
@@ -4012,7 +3667,7 @@ PassThrough.prototype._transform = function(chunk, encoding, cb) {
   cb(null, chunk);
 };
 
-},{"./_stream_transform":20,"core-util-is":22,"inherits":8}],19:[function(require,module,exports){
+},{"./_stream_transform":19,"core-util-is":21,"inherits":7}],18:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -4989,7 +4644,7 @@ function indexOf (xs, x) {
 }
 
 }).call(this,require('_process'))
-},{"./_stream_duplex":17,"_process":11,"buffer":3,"core-util-is":22,"events":7,"inherits":8,"isarray":10,"process-nextick-args":23,"string_decoder/":35,"util":2}],20:[function(require,module,exports){
+},{"./_stream_duplex":16,"_process":10,"buffer":3,"core-util-is":21,"events":6,"inherits":7,"isarray":9,"process-nextick-args":22,"string_decoder/":34,"util":2}],19:[function(require,module,exports){
 // a transform stream is a readable/writable stream where you do
 // something with the data.  Sometimes it's called a "filter",
 // but that's not a great name for it, since that implies a thing where
@@ -5188,7 +4843,7 @@ function done(stream, er) {
   return stream.push(null);
 }
 
-},{"./_stream_duplex":17,"core-util-is":22,"inherits":8}],21:[function(require,module,exports){
+},{"./_stream_duplex":16,"core-util-is":21,"inherits":7}],20:[function(require,module,exports){
 // A bit simpler than readable streams.
 // Implement an async ._write(chunk, encoding, cb), and it'll handle all
 // the drain event emission and buffering.
@@ -5717,7 +5372,7 @@ function endWritable(stream, state, cb) {
   state.ended = true;
 }
 
-},{"./_stream_duplex":17,"buffer":3,"core-util-is":22,"events":7,"inherits":8,"process-nextick-args":23,"util-deprecate":24}],22:[function(require,module,exports){
+},{"./_stream_duplex":16,"buffer":3,"core-util-is":21,"events":6,"inherits":7,"process-nextick-args":22,"util-deprecate":23}],21:[function(require,module,exports){
 (function (Buffer){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -5828,7 +5483,7 @@ function objectToString(o) {
 }
 
 }).call(this,{"isBuffer":require("../../../../insert-module-globals/node_modules/is-buffer/index.js")})
-},{"../../../../insert-module-globals/node_modules/is-buffer/index.js":9}],23:[function(require,module,exports){
+},{"../../../../insert-module-globals/node_modules/is-buffer/index.js":8}],22:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -5852,7 +5507,7 @@ function nextTick(fn) {
 }
 
 }).call(this,require('_process'))
-},{"_process":11}],24:[function(require,module,exports){
+},{"_process":10}],23:[function(require,module,exports){
 (function (global){
 
 /**
@@ -5923,10 +5578,10 @@ function config (name) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],25:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 module.exports = require("./lib/_stream_passthrough.js")
 
-},{"./lib/_stream_passthrough.js":18}],26:[function(require,module,exports){
+},{"./lib/_stream_passthrough.js":17}],25:[function(require,module,exports){
 var Stream = (function (){
   try {
     return require('st' + 'ream'); // hack to fix a circular dependency issue when used with browserify
@@ -5940,13 +5595,13 @@ exports.Duplex = require('./lib/_stream_duplex.js');
 exports.Transform = require('./lib/_stream_transform.js');
 exports.PassThrough = require('./lib/_stream_passthrough.js');
 
-},{"./lib/_stream_duplex.js":17,"./lib/_stream_passthrough.js":18,"./lib/_stream_readable.js":19,"./lib/_stream_transform.js":20,"./lib/_stream_writable.js":21}],27:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":16,"./lib/_stream_passthrough.js":17,"./lib/_stream_readable.js":18,"./lib/_stream_transform.js":19,"./lib/_stream_writable.js":20}],26:[function(require,module,exports){
 module.exports = require("./lib/_stream_transform.js")
 
-},{"./lib/_stream_transform.js":20}],28:[function(require,module,exports){
+},{"./lib/_stream_transform.js":19}],27:[function(require,module,exports){
 module.exports = require("./lib/_stream_writable.js")
 
-},{"./lib/_stream_writable.js":21}],29:[function(require,module,exports){
+},{"./lib/_stream_writable.js":20}],28:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -6075,7 +5730,7 @@ Stream.prototype.pipe = function(dest, options) {
   return dest;
 };
 
-},{"events":7,"inherits":8,"readable-stream/duplex.js":16,"readable-stream/passthrough.js":25,"readable-stream/readable.js":26,"readable-stream/transform.js":27,"readable-stream/writable.js":28}],30:[function(require,module,exports){
+},{"events":6,"inherits":7,"readable-stream/duplex.js":15,"readable-stream/passthrough.js":24,"readable-stream/readable.js":25,"readable-stream/transform.js":26,"readable-stream/writable.js":27}],29:[function(require,module,exports){
 var ClientRequest = require('./lib/request')
 var extend = require('xtend')
 var statusCodes = require('builtin-status-codes')
@@ -6150,7 +5805,7 @@ http.METHODS = [
 	'UNLOCK',
 	'UNSUBSCRIBE'
 ]
-},{"./lib/request":32,"builtin-status-codes":34,"url":36,"xtend":38}],31:[function(require,module,exports){
+},{"./lib/request":31,"builtin-status-codes":33,"url":35,"xtend":37}],30:[function(require,module,exports){
 (function (global){
 exports.fetch = isFunction(global.fetch) && isFunction(global.ReadableByteStream)
 
@@ -6194,7 +5849,7 @@ function isFunction (value) {
 xhr = null // Help gc
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],32:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 (function (process,global,Buffer){
 // var Base64 = require('Base64')
 var capability = require('./capability')
@@ -6473,7 +6128,7 @@ var unsafeHeaders = [
 ]
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
-},{"./capability":31,"./response":33,"_process":11,"buffer":3,"inherits":8,"stream":29}],33:[function(require,module,exports){
+},{"./capability":30,"./response":32,"_process":10,"buffer":3,"inherits":7,"stream":28}],32:[function(require,module,exports){
 (function (process,global,Buffer){
 var capability = require('./capability')
 var inherits = require('inherits')
@@ -6649,7 +6304,7 @@ IncomingMessage.prototype._onXHRProgress = function () {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
-},{"./capability":31,"_process":11,"buffer":3,"inherits":8,"stream":29}],34:[function(require,module,exports){
+},{"./capability":30,"_process":10,"buffer":3,"inherits":7,"stream":28}],33:[function(require,module,exports){
 module.exports = {
   "100": "Continue",
   "101": "Switching Protocols",
@@ -6710,7 +6365,7 @@ module.exports = {
   "511": "Network Authentication Required"
 }
 
-},{}],35:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -6933,7 +6588,7 @@ function base64DetectIncompleteChar(buffer) {
   this.charLength = this.charReceived ? 3 : 0;
 }
 
-},{"buffer":3}],36:[function(require,module,exports){
+},{"buffer":3}],35:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -7667,7 +7322,7 @@ Url.prototype.parseHost = function() {
   if (host) this.hostname = host;
 };
 
-},{"./util":37,"punycode":12,"querystring":15}],37:[function(require,module,exports){
+},{"./util":36,"punycode":11,"querystring":14}],36:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -7685,7 +7340,7 @@ module.exports = {
   }
 };
 
-},{}],38:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 module.exports = extend
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
