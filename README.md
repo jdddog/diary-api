@@ -1,14 +1,16 @@
-# uoacalendar-js
+# diary-api
 
-This project contains the Javascript UoACalendar REST API client library.
+Welcome to diary-api...
 
 ## Documentation
 
-The complete documentation for developing with uoacalendar-js is available on the [project website](http://uoa-compsci.github.io/uoacalendar-js/).
+To get started with the diary-api take a look at the [daily habits tutorial](https://github.com/jdddog/daily-habits/wiki), which explains how to setup your web development environment and shows you how to use the diary-api to create a fully functioning web application.
 
-## Development
+Detailed documentation on the classes and methods available in the diary-api are explained [here]().
 
-uoacalendar-js is implemented with [Coffeescript](http://coffeescript.org/), it has several dependencies which are used to manage the project and compile `UoACalendarClient.coffee` into a standalone browser library.
+## Developing diaryapi
+
+diaryapi is implemented with [Coffeescript](http://coffeescript.org/), it has several dependencies which are used to manage the project and compile `UoACalendarClient.coffee` into a standalone browser library.
 
 * [Node.js](https://nodejs.org/en/): npm is used to install dependencies.
 * [browserify](http://browserify.org/) and [coffeeify](https://www.npmjs.com/package/coffeeify): Used to compile `UoACalendarClient.coffee` into a standalone browser JavaScript library.
