@@ -2,122 +2,68 @@
 
 This project contains the Javascript UoACalendar REST API client library.
 
-## Setup
+## Documentation
 
-You may use [Bower](http://bower.io/) to install the library:
-
-```bash
-$ bower install uoacalendar-js
-```
-
-Then just include the script into your HTML code:
-
-```html
-<script src='bower_components/uoacalendar-js/dist/uoacalendar.js'></script>
-```
-
-## Obtain an API token
-
-Before getting started you should obtain an API token, which can be retrieved using your UPI credentials:
-
-```bash
-$ curl -X POST -d "username=$USERNAME&password=$PASSWORD" http://diaryapi.auckland.ac.nz:8000/api-token-auth
-{"token":"<YOUR_API_TOKEN>"}
-```
-
-Copy *JUST* the value of the token returned by the server. 
-
-> Make sure you keep this token safe as it is used by the server to determine the user that sends the requests as means of authentication, so you don't want other users to mess up with your calendars, or do you?
-
-## Interacting with the server
-
-Now, in your Javascript code you may instantiate a client object:
-
-```Javascript
-var client = new UoACalendarClient({ apiToken: "<YOUR_API_TOKEN>"});
-```
-
-At this point you are ready to interact with the calendar backend.
-
-Let's create our first calendar:
-
-```Javascript
-client.addCalendar("My Calendar", 
-	// onSuccess callback
-    function(res, data) {
-    	// response
-        console.log(res);
-        // deserialized new calendar data
-        // { name: "My Calendar", id: 1 }
-        console.log(data);
-    },
-    // onError callback
-    function(res, data) {
-        ...
-    }
-);
-```
-
-> Note: All functions take `onSuccess` and `onError` callbacks as optional parameters, so you don't need to provide them if not needed.
-
-Make sure you keep the calendar ID, as you'll need it to add new events to it:
-
- ```Javascript
-client.addEvent(calendarId, { name: "Star Wars Release Date", ...} 
-	// onSuccess callback
-    function(res, data) {
-    	// response
-        console.log(res);
-        // deserialized new event data
-        // { name: "Star Wars Release Date", id: 1 }
-        console.log(data);
-    },
-    // onError callback
-    function(res, data) {
-        ...
-    }
-);
-```
-
-Now you can query the events from your calendar from a specifc date range:
-
- ```Javascript
-client.findEvents(calendarId, new Date(1977, 5, 25), Date.now(),
-	// onSuccess callback
-    function(res, data) {
-    	// response
-        console.log(res);
-        // deserialized events dictionary
-        // { name: "Star Wars Release Date", id: 1 }
-        console.log(data);
-    },
-    // onError callback
-    function(res, data) {
-        ...
-    }
-);
-```
-
-> Note: You may find complete documentation of all available methods in `UoACalendarClient.coffee`
-
-## Advanced requests
-
-For the full list of the calendar API endpoints, please refer to the online documentation [here](http://diaryapi.auckland.ac.nz/docs).
-
-If the client does not provide a method specific to the endpoint that you want to use, you can use the `sendRequest` method:
-
-```Javascript
-client.sendRequest('/resource/', 'POST', { myData: 1});
-```
+The complete documentation for developing with uoacalendar-js is available on the [project website](http://uoa-compsci.github.io/uoacalendar-js/).
 
 ## Development
 
-The client is implemented using [Coffeescript](http://coffeescript.org/) and compiled into an standalone browser library using [Browserify](http://browserify.org/).
+uoacalendar-js is implemented with [Coffeescript](http://coffeescript.org/), it has several dependencies which are used to manage the project and compile `UoACalendarClient.coffee` into a standalone browser library.
 
-To build a new version of the distributable library (`dist/uoacalendar.js`) run:
+* [Node.js](https://nodejs.org/en/): npm is used to install dependencies.
+* [browserify](http://browserify.org/) and [coffeeify](https://www.npmjs.com/package/coffeeify): Used to compile `UoACalendarClient.coffee` into a standalone browser JavaScript library.
+* [jsdoc](http://usejsdoc.org/): Generate source code documentation.
+
+The following instructions explain how to setup your development environment. [WebStorm](https://www.jetbrains.com/webstorm/) is the recommended JavaScript IDE to use with the project, a file watcher is included which automatically compiles Coffeescript into JavaScript.
+
+### Install Node.js
+
+Download and install [Node.js](https://nodejs.org/en/). Once Node.js is installed you should be able to run the following from a terminal:
 
 ```bash
-$ make
+C:\Users\user>node -h
+Usage: node [options] [ -e script | script.js ] [arguments]
+...
 ```
+If you get the following error restart your computer.
+
+```bash
+'C:\Users\user>node -h' is not recognized as an internal or external command,
+operable program or batch file.
+```
+
+### Clone project
+Open a terminal in the desired location and clone the uoacalendar-js project.
+
+```bash
+C:\Users\user> git clone https://github.com/UoA-CompSci/uoacalendar-js.git
+```
+
+### Download dependencies
+In the uoacalendar-js folder run the following command to download the dependencies:
+
+```bash
+C:\Users\user\uoacalendar-js>npm install
+```
+
+### Compile Coffee into JavaScript
+
+There are two ways to compile `UoACalendarClient.coffee` into JavaScript, in both cases the generated JavaScript file is saved to: `dist/uoacalendar.js`.
+
+1) If using WebStorm, when UoACalendarClient.coffee is saved it is automatically converted into JavaScript via a file watcher. 
+
+If you opened the project in WebStorm before running `npm install` then you will receive the following error: `An exception occurred while executing watcher 'Compile CoffeeScript'. Watcher has been disabled. Fix it.: Invalid exe`. In this case make sure you have installed the dependnencies with `npm install` and then re-enable the file watcher: File -> Settings -> Tools -> File Watchers -> Tick `Compile CoffeeScript`.
+
+2) If not using WebStorm run the following command (this has only been tested on Linux).
+
+```bash
+C:\Users\user\uoacalendar-js> make
+```
+
+### Generating source code documentation
+
+uocalendar-js is documented with [jsdoc](http://usejsdoc.org/).
+
+
 
 
