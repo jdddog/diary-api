@@ -2,13 +2,13 @@
 
 Welcome to diary-api...
 
-## User Documentation
+## Getting started
 
 To get started with the diary-api take a look at the [daily habits tutorial](https://github.com/jdddog/daily-habits/wiki), which explains how to setup your web development environment and shows you how to use the diary-api to create a fully functioning web application.
 
-Detailed documentation on the classes and methods available in the diary-api are explained [here]().
+Detailed documentation on the classes and methods available in the diary-api are [here]().
 
-## Developer Documentation
+## Development
 
 diary-api is implemented with [Coffeescript](http://coffeescript.org/), it has several dependencies which are used to manage the project and compile `UoACalendarClient.coffee` into a standalone browser library.
 
