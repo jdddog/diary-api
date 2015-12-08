@@ -209,10 +209,8 @@ UoACalendarClient = (function() {
           }
           return resolve(parsed);
         } else {
-          return reject({
-            statusCode: res.statusCode,
-            reason: data
-          });
+          data.statusCode = res.statusCode;
+          return reject(data);
         }
       });
     });
@@ -446,63 +444,72 @@ UoACalendarClient = (function() {
     return new Promise(action.bind(this));
   };
 
+
+  /**
+  * Add multiple events to a calendar.
+  * @param {number} calendarId - id of calendar
+  * @param {Array.<{Event}>} eventIds - an array of numeric event ids
+  * @returns {Promise.<Array.<Event>, Array.<{statusCode: number, detail: string}>>} A promise that contains an array of events objects if resolved or an array of errors if rejected.
+  *
+  * @example
+  * var calendarId = 1;
+  * var events = [{title: "Run", start: new Date(2013, 1, 1), end: new Date(2013, 1, 1)},
+                  {title: "Eat", start: new Date(2015, 1, 1), end: new Date(2015, 1, 1)}];
+  * client.addEvents(calendarId, events).then(function(data){
+  *     console.log(JSON.stringify(data));
+  * }).catch(function(error){
+  *     console.log(JSON.stringify(error));
+  * });
+   */
+
   UoACalendarClient.prototype.addEvents = function(calendarId, events) {
     var action;
     action = function(resolve, reject) {
-      var count, data, httpResponses, i, numEvents;
-      data = [];
-      httpResponses = [];
+      var count, dataAddEvents, errorAddEvents, i, numEvents;
+      dataAddEvents = [];
+      errorAddEvents = [];
       numEvents = events.length;
       count = 0;
       i = 0;
       while (i < numEvents) {
-        this.addEvent(calendarId, events[i]).then(function(args) {
-          httpResponses.push(args.res);
-          data.push(args.data);
+        this.addEvent(calendarId, events[i]).then(function(data) {
+          dataAddEvents.push(data);
           count++;
           if (count >= numEvents) {
-            return resolve({
-              res: httpResponses,
-              data: data
-            });
+            return resolve(dataAddEvents);
           }
-        }, function(err) {
-          httpResponses.push(args.res);
-          data.push(args.data);
+        }, function(error) {
+          errorAddEvents.push(error);
           count++;
           if (count >= numEvents) {
-            return reject({
-              res: httpResponses,
-              data: data
-            });
+            return reject(errorAddEvents);
           }
         });
         i++;
       }
     };
     return new Promise(action.bind(this));
+
+    /**
+      * Delete an existing event from a calendar giving their ids
+      *
+      * @param {number} calendarId - id of calendar
+      * @param {number} eventId - id of event
+      * @returns {Promise.<Array, Array.<{statusCode: number, detail: string}>>} A promise that contains an empty object if resolved or an error if rejected.
+      *
+      * @example
+      * var calendarId = 1;
+      * var eventId = 2;
+      * client.deleteEvent(calendarId, eventId).then(function(data){
+      *     console.log(JSON.stringify(data));
+      * }).catch(function(error){
+      *     console.log(JSON.stringify(error));
+      * });
+      *
+      * @example <caption>Example output when event deleted successfully</caption>
+      * {}
+     */
   };
-
-
-  /**
-  * Delete an existing event from a calendar giving their ids
-  *
-  * @param {number} calendarId - id of calendar
-  * @param {number} eventId - id of event
-  * @returns {Promise.<Object, Object.<{statusCode: number, detail: string}>>} A promise that contains an empty object if resolved or an error if rejected.
-  *
-  * @example
-  * var calendarId = 1;
-  * var eventId = 2;
-  * client.deleteEvent(calendarId, eventId).then(function(data){
-  *     console.log(JSON.stringify(data));
-  * }).catch(function(error){
-  *     console.log(JSON.stringify(error));
-  * });
-  *
-  * @example <caption>Example output when event deleted successfully</caption>
-  * {}
-   */
 
   UoACalendarClient.prototype.deleteEvent = function(calendarId, eventId) {
     var action;
@@ -512,36 +519,45 @@ UoACalendarClient = (function() {
     return new Promise(action.bind(this));
   };
 
+
+  /**
+  * Delete multiple events from a calendar.
+  * @param {number} calendarId - id of calendar
+  * @param {number[]} eventIds - an array of numeric event ids
+  * @returns {Promise.<Object, Object.<{statusCode: number, detail: string}>>} A promise that contains an array of empty objects if resolved or an array of errors if rejected.
+  *
+  * @example
+  * var calendarId = 1;
+  * var eventIds = [1,2,3,4];
+  * client.deleteEvents(calendarId, eventIds).then(function(data){
+  *     console.log(JSON.stringify(data));
+  * }).catch(function(error){
+  *     console.log(JSON.stringify(error));
+  * });
+   */
+
   UoACalendarClient.prototype.deleteEvents = function(calendarId, eventIds) {
     var action;
     action = function(resolve, reject) {
-      var count, data, eventId, httpResponses, i, numEvents;
-      data = [];
-      httpResponses = [];
+      var count, dataAddEvents, errorAddEvents, eventId, i, numEvents;
+      dataAddEvents = [];
+      errorAddEvents = [];
       numEvents = eventIds.length;
       count = 0;
       i = 0;
       while (i < numEvents) {
         eventId = eventIds[i];
-        this.deleteEvent(calendarId, eventId).then(function(args) {
-          httpResponses.push(args.res);
-          data.push(args.data);
+        this.deleteEvent(calendarId, eventId).then(function(data) {
+          dataAddEvents.push(data);
           count++;
           if (count >= numEvents) {
-            return resolve({
-              res: httpResponses,
-              data: data
-            });
+            return resolve(dataAddEvents);
           }
-        }, function(err) {
-          httpResponses.push(args.res);
-          data.push(args.data);
+        }, function(error) {
+          errorAddEvents.push(error);
           count++;
           if (count >= numEvents) {
-            return reject({
-              res: httpResponses,
-              data: data
-            });
+            return reject(errorAddEvents);
           }
         });
         i++;
@@ -634,7 +650,7 @@ module.exports = function(apiToken, host, port) {
 };
 
 
-},{"http":29}],2:[function(require,module,exports){
+},{"http":30}],2:[function(require,module,exports){
 
 },{}],3:[function(require,module,exports){
 (function (global){
@@ -648,7 +664,7 @@ module.exports = function(apiToken, host, port) {
 
 var base64 = require('base64-js')
 var ieee754 = require('ieee754')
-var isArray = require('isarray')
+var isArray = require('is-array')
 
 exports.Buffer = Buffer
 exports.SlowBuffer = SlowBuffer
@@ -2184,7 +2200,7 @@ function blitBuffer (src, dst, offset, length) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"base64-js":4,"ieee754":5,"isarray":9}],4:[function(require,module,exports){
+},{"base64-js":4,"ieee754":5,"is-array":6}],4:[function(require,module,exports){
 var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
 ;(function (exports) {
@@ -2397,6 +2413,41 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 }
 
 },{}],6:[function(require,module,exports){
+
+/**
+ * isArray
+ */
+
+var isArray = Array.isArray;
+
+/**
+ * toString
+ */
+
+var str = Object.prototype.toString;
+
+/**
+ * Whether or not the given `val`
+ * is an array.
+ *
+ * example:
+ *
+ *        isArray([]);
+ *        // > true
+ *        isArray(arguments);
+ *        // > false
+ *        isArray('');
+ *        // > false
+ *
+ * @param {mixed} val
+ * @return {bool}
+ */
+
+module.exports = isArray || function (val) {
+  return !! val && '[object Array]' == str.call(val);
+};
+
+},{}],7:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -2696,7 +2747,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -2721,7 +2772,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 /**
  * Determine if an object is Buffer
  *
@@ -2740,12 +2791,12 @@ module.exports = function (obj) {
     ))
 }
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 module.exports = Array.isArray || function (arr) {
   return Object.prototype.toString.call(arr) == '[object Array]';
 };
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -2838,7 +2889,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 (function (global){
 /*! https://mths.be/punycode v1.3.2 by @mathias */
 ;(function(root) {
@@ -3372,7 +3423,7 @@ process.umask = function() { return 0; };
 }(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -3458,7 +3509,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -3545,16 +3596,16 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":12,"./encode":13}],15:[function(require,module,exports){
+},{"./decode":13,"./encode":14}],16:[function(require,module,exports){
 module.exports = require("./lib/_stream_duplex.js")
 
-},{"./lib/_stream_duplex.js":16}],16:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":17}],17:[function(require,module,exports){
 // a duplex stream is just a stream that is both readable and writable.
 // Since JS doesn't have multiple prototypal inheritance, this class
 // prototypally inherits from Readable, and then parasitically from
@@ -3638,7 +3689,7 @@ function forEach (xs, f) {
   }
 }
 
-},{"./_stream_readable":18,"./_stream_writable":20,"core-util-is":21,"inherits":7,"process-nextick-args":22}],17:[function(require,module,exports){
+},{"./_stream_readable":19,"./_stream_writable":21,"core-util-is":22,"inherits":8,"process-nextick-args":23}],18:[function(require,module,exports){
 // a passthrough stream.
 // basically just the most minimal sort of Transform stream.
 // Every written chunk gets output as-is.
@@ -3667,7 +3718,7 @@ PassThrough.prototype._transform = function(chunk, encoding, cb) {
   cb(null, chunk);
 };
 
-},{"./_stream_transform":19,"core-util-is":21,"inherits":7}],18:[function(require,module,exports){
+},{"./_stream_transform":20,"core-util-is":22,"inherits":8}],19:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -4644,7 +4695,7 @@ function indexOf (xs, x) {
 }
 
 }).call(this,require('_process'))
-},{"./_stream_duplex":16,"_process":10,"buffer":3,"core-util-is":21,"events":6,"inherits":7,"isarray":9,"process-nextick-args":22,"string_decoder/":34,"util":2}],19:[function(require,module,exports){
+},{"./_stream_duplex":17,"_process":11,"buffer":3,"core-util-is":22,"events":7,"inherits":8,"isarray":10,"process-nextick-args":23,"string_decoder/":35,"util":2}],20:[function(require,module,exports){
 // a transform stream is a readable/writable stream where you do
 // something with the data.  Sometimes it's called a "filter",
 // but that's not a great name for it, since that implies a thing where
@@ -4843,7 +4894,7 @@ function done(stream, er) {
   return stream.push(null);
 }
 
-},{"./_stream_duplex":16,"core-util-is":21,"inherits":7}],20:[function(require,module,exports){
+},{"./_stream_duplex":17,"core-util-is":22,"inherits":8}],21:[function(require,module,exports){
 // A bit simpler than readable streams.
 // Implement an async ._write(chunk, encoding, cb), and it'll handle all
 // the drain event emission and buffering.
@@ -5372,7 +5423,7 @@ function endWritable(stream, state, cb) {
   state.ended = true;
 }
 
-},{"./_stream_duplex":16,"buffer":3,"core-util-is":21,"events":6,"inherits":7,"process-nextick-args":22,"util-deprecate":23}],21:[function(require,module,exports){
+},{"./_stream_duplex":17,"buffer":3,"core-util-is":22,"events":7,"inherits":8,"process-nextick-args":23,"util-deprecate":24}],22:[function(require,module,exports){
 (function (Buffer){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -5483,7 +5534,7 @@ function objectToString(o) {
 }
 
 }).call(this,{"isBuffer":require("../../../../insert-module-globals/node_modules/is-buffer/index.js")})
-},{"../../../../insert-module-globals/node_modules/is-buffer/index.js":8}],22:[function(require,module,exports){
+},{"../../../../insert-module-globals/node_modules/is-buffer/index.js":9}],23:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -5507,7 +5558,7 @@ function nextTick(fn) {
 }
 
 }).call(this,require('_process'))
-},{"_process":10}],23:[function(require,module,exports){
+},{"_process":11}],24:[function(require,module,exports){
 (function (global){
 
 /**
@@ -5578,10 +5629,10 @@ function config (name) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 module.exports = require("./lib/_stream_passthrough.js")
 
-},{"./lib/_stream_passthrough.js":17}],25:[function(require,module,exports){
+},{"./lib/_stream_passthrough.js":18}],26:[function(require,module,exports){
 var Stream = (function (){
   try {
     return require('st' + 'ream'); // hack to fix a circular dependency issue when used with browserify
@@ -5595,13 +5646,13 @@ exports.Duplex = require('./lib/_stream_duplex.js');
 exports.Transform = require('./lib/_stream_transform.js');
 exports.PassThrough = require('./lib/_stream_passthrough.js');
 
-},{"./lib/_stream_duplex.js":16,"./lib/_stream_passthrough.js":17,"./lib/_stream_readable.js":18,"./lib/_stream_transform.js":19,"./lib/_stream_writable.js":20}],26:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":17,"./lib/_stream_passthrough.js":18,"./lib/_stream_readable.js":19,"./lib/_stream_transform.js":20,"./lib/_stream_writable.js":21}],27:[function(require,module,exports){
 module.exports = require("./lib/_stream_transform.js")
 
-},{"./lib/_stream_transform.js":19}],27:[function(require,module,exports){
+},{"./lib/_stream_transform.js":20}],28:[function(require,module,exports){
 module.exports = require("./lib/_stream_writable.js")
 
-},{"./lib/_stream_writable.js":20}],28:[function(require,module,exports){
+},{"./lib/_stream_writable.js":21}],29:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -5730,7 +5781,7 @@ Stream.prototype.pipe = function(dest, options) {
   return dest;
 };
 
-},{"events":6,"inherits":7,"readable-stream/duplex.js":15,"readable-stream/passthrough.js":24,"readable-stream/readable.js":25,"readable-stream/transform.js":26,"readable-stream/writable.js":27}],29:[function(require,module,exports){
+},{"events":7,"inherits":8,"readable-stream/duplex.js":16,"readable-stream/passthrough.js":25,"readable-stream/readable.js":26,"readable-stream/transform.js":27,"readable-stream/writable.js":28}],30:[function(require,module,exports){
 var ClientRequest = require('./lib/request')
 var extend = require('xtend')
 var statusCodes = require('builtin-status-codes')
@@ -5805,7 +5856,7 @@ http.METHODS = [
 	'UNLOCK',
 	'UNSUBSCRIBE'
 ]
-},{"./lib/request":31,"builtin-status-codes":33,"url":35,"xtend":37}],30:[function(require,module,exports){
+},{"./lib/request":32,"builtin-status-codes":34,"url":36,"xtend":38}],31:[function(require,module,exports){
 (function (global){
 exports.fetch = isFunction(global.fetch) && isFunction(global.ReadableByteStream)
 
@@ -5849,7 +5900,7 @@ function isFunction (value) {
 xhr = null // Help gc
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 (function (process,global,Buffer){
 // var Base64 = require('Base64')
 var capability = require('./capability')
@@ -6128,7 +6179,7 @@ var unsafeHeaders = [
 ]
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
-},{"./capability":30,"./response":32,"_process":10,"buffer":3,"inherits":7,"stream":28}],32:[function(require,module,exports){
+},{"./capability":31,"./response":33,"_process":11,"buffer":3,"inherits":8,"stream":29}],33:[function(require,module,exports){
 (function (process,global,Buffer){
 var capability = require('./capability')
 var inherits = require('inherits')
@@ -6304,7 +6355,7 @@ IncomingMessage.prototype._onXHRProgress = function () {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
-},{"./capability":30,"_process":10,"buffer":3,"inherits":7,"stream":28}],33:[function(require,module,exports){
+},{"./capability":31,"_process":11,"buffer":3,"inherits":8,"stream":29}],34:[function(require,module,exports){
 module.exports = {
   "100": "Continue",
   "101": "Switching Protocols",
@@ -6365,7 +6416,7 @@ module.exports = {
   "511": "Network Authentication Required"
 }
 
-},{}],34:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -6588,7 +6639,7 @@ function base64DetectIncompleteChar(buffer) {
   this.charLength = this.charReceived ? 3 : 0;
 }
 
-},{"buffer":3}],35:[function(require,module,exports){
+},{"buffer":3}],36:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -7322,7 +7373,7 @@ Url.prototype.parseHost = function() {
   if (host) this.hostname = host;
 };
 
-},{"./util":36,"punycode":11,"querystring":14}],36:[function(require,module,exports){
+},{"./util":37,"punycode":12,"querystring":15}],37:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -7340,7 +7391,7 @@ module.exports = {
   }
 };
 
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 module.exports = extend
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;

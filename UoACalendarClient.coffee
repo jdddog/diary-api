@@ -183,7 +183,9 @@ class UoACalendarClient
           # Server error, I have no idea what happend in the backend
           # but server at least returned correctly (in a HTTP protocol
           # sense) formatted response
-          reject({statusCode: res.statusCode, reason: data})
+
+          data.statusCode = res.statusCode;
+          reject(data)
       )
     )
 
@@ -384,37 +386,52 @@ class UoACalendarClient
     action = (resolve, reject) -> @sendRequest('/calendars/' + calendarId + '/events/', 'POST', event, resolve, reject)
     new Promise(action.bind(@))
 
+  ###*
+  * Add multiple events to a calendar.
+  * @param {number} calendarId - id of calendar
+  * @param {Array.<{Event}>} eventIds - an array of numeric event ids
+  * @returns {Promise.<Array.<Event>, Array.<{statusCode: number, detail: string}>>} A promise that contains an array of events objects if resolved or an array of errors if rejected.
+  *
+  * @example
+  * var calendarId = 1;
+  * var events = [{title: "Run", start: new Date(2013, 1, 1), end: new Date(2013, 1, 1)},
+                  {title: "Eat", start: new Date(2015, 1, 1), end: new Date(2015, 1, 1)}];
+  * client.addEvents(calendarId, events).then(function(data){
+  *     console.log(JSON.stringify(data));
+  * }).catch(function(error){
+  *     console.log(JSON.stringify(error));
+  * });
+  ###
+
   addEvents: (calendarId, events) ->
     action = (resolve, reject) ->
-      data = []
-      httpResponses = []
+      dataAddEvents = []
+      errorAddEvents = []
       numEvents = events.length
       count = 0
       i = 0
       while i < numEvents
         @addEvent(calendarId, events[i])
-        .then (args) ->
-          httpResponses.push args.res
-          data.push args.data
+        .then (data) ->
+          dataAddEvents.push data
           count++
           if count >= numEvents
-            resolve({res: httpResponses, data: data})
-        , (err) ->
-          httpResponses.push args.res
-          data.push args.data
+            resolve(dataAddEvents)
+        , (error) ->
+          errorAddEvents.push error
           count++
           if count >= numEvents
-            reject({res: httpResponses, data: data})
+            reject(errorAddEvents)
         i++
       return
     new Promise(action.bind(@))
 
-  ###*
+    ###*
   * Delete an existing event from a calendar giving their ids
   *
   * @param {number} calendarId - id of calendar
   * @param {number} eventId - id of event
-  * @returns {Promise.<Object, Object.<{statusCode: number, detail: string}>>} A promise that contains an empty object if resolved or an error if rejected.
+  * @returns {Promise.<Array, Array.<{statusCode: number, detail: string}>>} A promise that contains an empty object if resolved or an error if rejected.
   *
   * @example
   * var calendarId = 1;
@@ -433,28 +450,42 @@ class UoACalendarClient
     action = (resolve, reject) -> @sendRequest('/calendars/' + calendarId + '/events/' + eventId + '/', 'DELETE', 0, resolve, reject)
     new Promise(action.bind(@))
 
+  ###*
+  * Delete multiple events from a calendar.
+  * @param {number} calendarId - id of calendar
+  * @param {number[]} eventIds - an array of numeric event ids
+  * @returns {Promise.<Object, Object.<{statusCode: number, detail: string}>>} A promise that contains an array of empty objects if resolved or an array of errors if rejected.
+  *
+  * @example
+  * var calendarId = 1;
+  * var eventIds = [1,2,3,4];
+  * client.deleteEvents(calendarId, eventIds).then(function(data){
+  *     console.log(JSON.stringify(data));
+  * }).catch(function(error){
+  *     console.log(JSON.stringify(error));
+  * });
+  ###
+
   deleteEvents: (calendarId, eventIds) ->
     action = (resolve, reject) ->
-      data = []
-      httpResponses = []
+      dataAddEvents = []
+      errorAddEvents = []
       numEvents = eventIds.length
       count = 0
       i = 0
       while i < numEvents
         eventId = eventIds[i]
         @deleteEvent(calendarId, eventId)
-        .then (args) ->
-          httpResponses.push args.res
-          data.push args.data
+        .then (data) ->
+          dataAddEvents.push data
           count++
           if count >= numEvents
-            resolve({res: httpResponses, data: data})
-        , (err) ->
-          httpResponses.push args.res
-          data.push args.data
+            resolve(dataAddEvents)
+        , (error) ->
+          errorAddEvents.push error
           count++
           if count >= numEvents
-            reject({res: httpResponses, data: data})
+            reject(errorAddEvents)
         i++
       return
     new Promise(action.bind(@))
