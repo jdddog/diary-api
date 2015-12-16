@@ -6,7 +6,7 @@ Welcome to diary-api...
 
 To get started with the diary-api take a look at the [daily habits tutorial](https://github.com/jdddog/daily-habits/wiki), which explains how to setup your web development environment and shows you how to use the diary-api to create a fully functioning web application.
 
-Detailed documentation on the classes and methods available in the diary-api are [here](http://jdddog.github.io/diary-api/).
+Detailed documentation on the classes and methods available in the diary-api can be found [here](http://jdddog.github.io/diary-api/).
 
 ## Development
 
