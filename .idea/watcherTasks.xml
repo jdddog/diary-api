@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectTasksOptions">
     <TaskOptions isEnabled="true">
-      <option name="arguments" value="--standalone=UoACalendarClient -t coffeeify UoACalendarClient.coffee --outfile=dist\uoacalendar.js" />
+      <option name="arguments" value="--standalone=DiaryClient -t coffeeify DiaryClient.coffee --outfile=dist/diary-api.js" />
       <option name="checkSyntaxErrors" value="true" />
       <option name="description" value="Compiles .coffee files into .js files using browserify and coffeeify" />
       <option name="exitCodeBehavior" value="ERROR" />
@@ -20,8 +20,7 @@
         </array>
       </option>
       <option name="outputFromStdout" value="false" />
-      <option name="passParentEnvs" value="true" />
-      <option name="program" value="$FileDir$/node_modules/.bin/browserify.cmd" />
+      <option name="program" value="$FileDir$/node_modules/.bin/browserify" />
       <option name="scopeName" value="Project Files" />
       <option name="trackOnlyRoot" value="true" />
       <option name="workingDir" value="$FileDir$" />

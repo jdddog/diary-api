@@ -1,3 +1,3 @@
 all:
-	./node_modules/.bin/browserify --standalone=UoACalendarClient -t coffeeify UoACalendarClient.coffee --outfile=dist/uoacalendar.js
+	./node_modules/.bin/browserify --standalone=DiaryClient -t coffeeify DiaryClient.coffee --outfile=dist/diary-api.js
 

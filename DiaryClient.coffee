@@ -1,12 +1,12 @@
 http = require "http"
 
-class UoACalendarClient
+class DiaryClient
 
   ###*
   * The default host used by the client as authentication server if no `host` variable is specified during
-  * UoACalendarClient instantiation.
+  * DiaryClient instantiation.
   *
-  * @name UoACalendarClient#DEFAULT_HOST
+  * @name DiaryClient#DEFAULT_HOST
   * @type string
   * @default sitcalprd01.its.auckland.ac.nz
   ###
@@ -14,9 +14,9 @@ class UoACalendarClient
   DEFAULT_HOST: 'diaryapi.auckland.ac.nz'
 
   ###*
-  * The default TCP port used by the client if no `port` variable is specified during UoACalendarClient instantiation.
+  * The default TCP port used by the client if no `port` variable is specified during DiaryClient instantiation.
   *
-  * @name UoACalendarClient#DEFAULT_PORT
+  * @name DiaryClient#DEFAULT_PORT
   * @type number
   * @default 345
   ###
@@ -32,15 +32,15 @@ class UoACalendarClient
   * @param {string} apiToken - Sets the user's API token used for authentication purposes.
   * @param {string=} host - Authentication server to which the client will connect. Should *NOT* include the URL schema as it defaults to `http`. Defaults to `DEFAULT_HOST`.
   * @param {number=} port - TCP port from the host to which the client will connect. Defaults to `DEFAULT_PORT`.
-  * @alias UoACalendarClient
+  * @alias DiaryClient
   *
-  * @example <caption>Minimal example of how to instantiate a UoACalendarClient. Default host and port used.</caption>
-  * var client = new UoACalendarClient("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJvcmlnX2lhdCI6MTQyMjQ5ODk0OSwiZXhwIjoxNDI" +
+  * @example <caption>Minimal example of how to instantiate a DiaryClient. Default host and port used.</caption>
+  * var client = new DiaryClient("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJvcmlnX2lhdCI6MTQyMjQ5ODk0OSwiZXhwIjoxNDI" +
   *                                     "yNDk5MjQ5LCJ1c2VyX2lkIjoyLCJ1c2VybmFtZSI6ImRldmVsb3BlciIsImVtYWlsIjoidGVzdEBhdWN" +
   *                                     "rbGFuZC5hYy5ueiJ9.7jLkEBovT2HvT2noL4xdIhddaY8wpZpEVYEDHnnNm1Y");
   *
   * @example <caption>Example where host and port specified.</caption>
-  * var client = new UoACalendarClient("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJvcmlnX2lhdCI6MTQyMjQ5ODk0OSwiZXhwIjoxNDI" +
+  * var client = new DiaryClient("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJvcmlnX2lhdCI6MTQyMjQ5ODk0OSwiZXhwIjoxNDI" +
   *                                     "yNDk5MjQ5LCJ1c2VyX2lkIjoyLCJ1c2VybmFtZSI6ImRldmVsb3BlciIsImVtYWlsIjoidGVzdEBhdWN" +
   *                                     "rbGFuZC5hYy5ueiJ9.7jLkEBovT2HvT2noL4xdIhddaY8wpZpEVYEDHnnNm1Y",
   *                                     "sitcalprd01.its.auckland.ac.nz", 345);
@@ -50,7 +50,7 @@ class UoACalendarClient
     if apiToken?
       @apiToken = apiToken
     else
-      console.error('UoACalendarClient constructor: please specify an apiToken')
+      console.error('DiaryClient constructor: please specify an apiToken')
 
     if host?
       @host = host
@@ -64,7 +64,7 @@ class UoACalendarClient
 
 
   ###*
-  * Return host used by UoACalendarClient instance.
+  * Return host used by DiaryClient instance.
   *
   * @returns {string}
   *
@@ -76,7 +76,7 @@ class UoACalendarClient
     return @host
 
   ###*
-  * Return port used by UoACalendarClient instance.
+  * Return port used by DiaryClient instance.
   *
   * @returns {number}
   *
@@ -88,7 +88,7 @@ class UoACalendarClient
     return @port
 
   ###*
-  * Return apiToken used by UoACalendarClient instance.
+  * Return apiToken used by DiaryClient instance.
   *
   * @returns {string}
   *
@@ -551,7 +551,7 @@ class UoACalendarClient
       {startDate: toUTCString(startDate), endDate: toUTCString(endDate)}, resolve, reject)
     new Promise(action.bind(@))
 
-exports.UoACalendarClient = UoACalendarClient
+exports.DiaryClient = DiaryClient
 
 module.exports = (apiToken, host, port) ->
-  return new UoACalendarClient(apiToken, host, port)
+  return new DiaryClient(apiToken, host, port)

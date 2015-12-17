@@ -1,30 +1,30 @@
-(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.UoACalendarClient = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var UoACalendarClient, http;
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.DiaryClient = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+var DiaryClient, http;
 
 http = require("http");
 
-UoACalendarClient = (function() {
+DiaryClient = (function() {
 
   /**
   * The default host used by the client as authentication server if no `host` variable is specified during
-  * UoACalendarClient instantiation.
+  * DiaryClient instantiation.
   *
-  * @name UoACalendarClient#DEFAULT_HOST
+  * @name DiaryClient#DEFAULT_HOST
   * @type string
   * @default sitcalprd01.its.auckland.ac.nz
    */
-  UoACalendarClient.prototype.DEFAULT_HOST = 'diaryapi.auckland.ac.nz';
+  DiaryClient.prototype.DEFAULT_HOST = 'diaryapi.auckland.ac.nz';
 
 
   /**
-  * The default TCP port used by the client if no `port` variable is specified during UoACalendarClient instantiation.
+  * The default TCP port used by the client if no `port` variable is specified during DiaryClient instantiation.
   *
-  * @name UoACalendarClient#DEFAULT_PORT
+  * @name DiaryClient#DEFAULT_PORT 
   * @type number
   * @default 345
    */
 
-  UoACalendarClient.prototype.DEFAULT_PORT = 345;
+  DiaryClient.prototype.DEFAULT_PORT = 345;
 
 
   /**
@@ -36,25 +36,25 @@ UoACalendarClient = (function() {
   * @param {string} apiToken - Sets the user's API token used for authentication purposes.
   * @param {string=} host - Authentication server to which the client will connect. Should *NOT* include the URL schema as it defaults to `http`. Defaults to `DEFAULT_HOST`.
   * @param {number=} port - TCP port from the host to which the client will connect. Defaults to `DEFAULT_PORT`.
-  * @alias UoACalendarClient
+  * @alias DiaryClient
   *
-  * @example <caption>Minimal example of how to instantiate a UoACalendarClient. Default host and port used.</caption>
-  * var client = new UoACalendarClient("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJvcmlnX2lhdCI6MTQyMjQ5ODk0OSwiZXhwIjoxNDI" +
+  * @example <caption>Minimal example of how to instantiate a DiaryClient. Default host and port used.</caption>
+  * var client = new DiaryClient("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJvcmlnX2lhdCI6MTQyMjQ5ODk0OSwiZXhwIjoxNDI" +
   *                                     "yNDk5MjQ5LCJ1c2VyX2lkIjoyLCJ1c2VybmFtZSI6ImRldmVsb3BlciIsImVtYWlsIjoidGVzdEBhdWN" +
   *                                     "rbGFuZC5hYy5ueiJ9.7jLkEBovT2HvT2noL4xdIhddaY8wpZpEVYEDHnnNm1Y");
   *
   * @example <caption>Example where host and port specified.</caption>
-  * var client = new UoACalendarClient("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJvcmlnX2lhdCI6MTQyMjQ5ODk0OSwiZXhwIjoxNDI" +
+  * var client = new DiaryClient("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJvcmlnX2lhdCI6MTQyMjQ5ODk0OSwiZXhwIjoxNDI" +
   *                                     "yNDk5MjQ5LCJ1c2VyX2lkIjoyLCJ1c2VybmFtZSI6ImRldmVsb3BlciIsImVtYWlsIjoidGVzdEBhdWN" +
   *                                     "rbGFuZC5hYy5ueiJ9.7jLkEBovT2HvT2noL4xdIhddaY8wpZpEVYEDHnnNm1Y",
   *                                     "sitcalprd01.its.auckland.ac.nz", 345);
    */
 
-  function UoACalendarClient(apiToken, host, port) {
+  function DiaryClient(apiToken, host, port) {
     if (apiToken != null) {
       this.apiToken = apiToken;
     } else {
-      console.error('UoACalendarClient constructor: please specify an apiToken');
+      console.error('DiaryClient constructor: please specify an apiToken');
     }
     if (host != null) {
       this.host = host;
@@ -70,7 +70,7 @@ UoACalendarClient = (function() {
 
 
   /**
-  * Return host used by UoACalendarClient instance.
+  * Return host used by DiaryClient instance.
   *
   * @returns {string}
   *
@@ -78,13 +78,13 @@ UoACalendarClient = (function() {
   * var host = client.getHost();
    */
 
-  UoACalendarClient.prototype.getHost = function() {
+  DiaryClient.prototype.getHost = function() {
     return this.host;
   };
 
 
   /**
-  * Return port used by UoACalendarClient instance.
+  * Return port used by DiaryClient instance.
   *
   * @returns {number}
   *
@@ -92,13 +92,13 @@ UoACalendarClient = (function() {
   * var host = client.getPort();
    */
 
-  UoACalendarClient.prototype.getPort = function() {
+  DiaryClient.prototype.getPort = function() {
     return this.port;
   };
 
 
   /**
-  * Return apiToken used by UoACalendarClient instance.
+  * Return apiToken used by DiaryClient instance.
   *
   * @returns {string}
   *
@@ -106,7 +106,7 @@ UoACalendarClient = (function() {
   * var apiToken = client.getApiToken();
    */
 
-  UoACalendarClient.prototype.getApiToken = function() {
+  DiaryClient.prototype.getApiToken = function() {
     return this.apiToken;
   };
 
@@ -122,7 +122,7 @@ UoACalendarClient = (function() {
   * @private
    */
 
-  UoACalendarClient.prototype.sendRequest = function(path, method, data, resolve, reject) {
+  DiaryClient.prototype.sendRequest = function(path, method, data, resolve, reject) {
     var getCookie, getHeaders, makeRequest, req;
     getCookie = function(name) {
       var c, ca, i, nameEQ;
@@ -245,7 +245,7 @@ UoACalendarClient = (function() {
   * [{"name":"asdasdasdasdasdasd","id":1}]
    */
 
-  UoACalendarClient.prototype.listCalendars = function() {
+  DiaryClient.prototype.listCalendars = function() {
     var action;
     action = function(resolve, reject) {
       return this.sendRequest('/calendars/', 'GET', 0, resolve, reject);
@@ -277,7 +277,7 @@ UoACalendarClient = (function() {
   * {"statusCode":403, "detail": "You do not have permission to perform this action."}
    */
 
-  UoACalendarClient.prototype.getCalendar = function(id) {
+  DiaryClient.prototype.getCalendar = function(id) {
     var action;
     action = function(resolve, reject) {
       return this.sendRequest('/calendars/' + id + '/', 'GET', 0, resolve, reject);
@@ -304,7 +304,7 @@ UoACalendarClient = (function() {
   *
    */
 
-  UoACalendarClient.prototype.addCalendar = function(name) {
+  DiaryClient.prototype.addCalendar = function(name) {
     var action;
     action = function(resolve, reject) {
       return this.sendRequest('/calendars/', 'POST', {
@@ -332,7 +332,7 @@ UoACalendarClient = (function() {
   * {}
    */
 
-  UoACalendarClient.prototype.deleteCalendar = function(id) {
+  DiaryClient.prototype.deleteCalendar = function(id) {
     var action;
     action = function(resolve, reject) {
       return this.sendRequest('/calendars/' + id + '/', 'DELETE', {}, resolve, reject);
@@ -363,7 +363,7 @@ UoACalendarClient = (function() {
   *   "todo":false,"location":null,"summary":null,"lastUpdate":"2014-12-18T20:54:58Z"}]
    */
 
-  UoACalendarClient.prototype.listEvents = function(calendarId) {
+  DiaryClient.prototype.listEvents = function(calendarId) {
     var action;
     action = function(resolve, reject) {
       return this.sendRequest('/calendars/' + calendarId + '/events/?format=json', 'GET', 0, resolve, reject);
@@ -436,7 +436,7 @@ UoACalendarClient = (function() {
   * {"statusCode":400, "start":"Datetime has wrong format. Use one of these formats instead: YYYY-MM-DDThh:mm[:ss[.uuuuuu]][+HH:MM|-HH:MM|Z]"}
    */
 
-  UoACalendarClient.prototype.addEvent = function(calendarId, event) {
+  DiaryClient.prototype.addEvent = function(calendarId, event) {
     var action;
     action = function(resolve, reject) {
       return this.sendRequest('/calendars/' + calendarId + '/events/', 'POST', event, resolve, reject);
@@ -462,7 +462,7 @@ UoACalendarClient = (function() {
   * });
    */
 
-  UoACalendarClient.prototype.addEvents = function(calendarId, events) {
+  DiaryClient.prototype.addEvents = function(calendarId, events) {
     var action;
     action = function(resolve, reject) {
       var count, dataAddEvents, errorAddEvents, i, numEvents;
@@ -511,7 +511,7 @@ UoACalendarClient = (function() {
      */
   };
 
-  UoACalendarClient.prototype.deleteEvent = function(calendarId, eventId) {
+  DiaryClient.prototype.deleteEvent = function(calendarId, eventId) {
     var action;
     action = function(resolve, reject) {
       return this.sendRequest('/calendars/' + calendarId + '/events/' + eventId + '/', 'DELETE', 0, resolve, reject);
@@ -536,7 +536,7 @@ UoACalendarClient = (function() {
   * });
    */
 
-  UoACalendarClient.prototype.deleteEvents = function(calendarId, eventIds) {
+  DiaryClient.prototype.deleteEvents = function(calendarId, eventIds) {
     var action;
     action = function(resolve, reject) {
       var count, dataAddEvents, errorAddEvents, eventId, i, numEvents;
@@ -597,7 +597,7 @@ UoACalendarClient = (function() {
   * });
    */
 
-  UoACalendarClient.prototype.updateEvent = function(calendarId, eventId, event) {
+  DiaryClient.prototype.updateEvent = function(calendarId, eventId, event) {
     var action;
     action = function(resolve, reject) {
       return this.sendRequest('/calendars/' + calendarId + '/events/' + eventId + '/', 'PATCH', event, resolve, reject);
@@ -625,7 +625,7 @@ UoACalendarClient = (function() {
   * });
    */
 
-  UoACalendarClient.prototype.findEvents = function(calendarId, startDate, endDate) {
+  DiaryClient.prototype.findEvents = function(calendarId, startDate, endDate) {
     var action, toUTCString;
     toUTCString = function(date) {
       return (new Date(date.getTime() + date.getTimezoneOffset() * 60000)).toISOString();
@@ -639,14 +639,14 @@ UoACalendarClient = (function() {
     return new Promise(action.bind(this));
   };
 
-  return UoACalendarClient;
+  return DiaryClient;
 
 })();
 
-exports.UoACalendarClient = UoACalendarClient;
+exports.DiaryClient = DiaryClient;
 
 module.exports = function(apiToken, host, port) {
-  return new UoACalendarClient(apiToken, host, port);
+  return new DiaryClient(apiToken, host, port);
 };
 
 
@@ -664,7 +664,7 @@ module.exports = function(apiToken, host, port) {
 
 var base64 = require('base64-js')
 var ieee754 = require('ieee754')
-var isArray = require('is-array')
+var isArray = require('isarray')
 
 exports.Buffer = Buffer
 exports.SlowBuffer = SlowBuffer
@@ -2200,7 +2200,7 @@ function blitBuffer (src, dst, offset, length) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"base64-js":4,"ieee754":5,"is-array":6}],4:[function(require,module,exports){
+},{"base64-js":4,"ieee754":5,"isarray":6}],4:[function(require,module,exports){
 var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
 ;(function (exports) {
@@ -2413,38 +2413,10 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 }
 
 },{}],6:[function(require,module,exports){
+var toString = {}.toString;
 
-/**
- * isArray
- */
-
-var isArray = Array.isArray;
-
-/**
- * toString
- */
-
-var str = Object.prototype.toString;
-
-/**
- * Whether or not the given `val`
- * is an array.
- *
- * example:
- *
- *        isArray([]);
- *        // > true
- *        isArray(arguments);
- *        // > false
- *        isArray('');
- *        // > false
- *
- * @param {mixed} val
- * @return {bool}
- */
-
-module.exports = isArray || function (val) {
-  return !! val && '[object Array]' == str.call(val);
+module.exports = Array.isArray || function (arr) {
+  return toString.call(arr) == '[object Array]';
 };
 
 },{}],7:[function(require,module,exports){
@@ -2891,7 +2863,7 @@ process.umask = function() { return 0; };
 
 },{}],12:[function(require,module,exports){
 (function (global){
-/*! https://mths.be/punycode v1.3.2 by @mathias */
+/*! https://mths.be/punycode v1.4.0 by @mathias */
 ;(function(root) {
 
 	/** Detect free variables */
@@ -2957,7 +2929,7 @@ process.umask = function() { return 0; };
 	 * @returns {Error} Throws a `RangeError` with the applicable error message.
 	 */
 	function error(type) {
-		throw RangeError(errors[type]);
+		throw new RangeError(errors[type]);
 	}
 
 	/**
@@ -3104,7 +3076,7 @@ process.umask = function() { return 0; };
 
 	/**
 	 * Bias adaptation function as per section 3.4 of RFC 3492.
-	 * http://tools.ietf.org/html/rfc3492#section-3.4
+	 * https://tools.ietf.org/html/rfc3492#section-3.4
 	 * @private
 	 */
 	function adapt(delta, numPoints, firstTime) {
@@ -3409,14 +3381,17 @@ process.umask = function() { return 0; };
 			return punycode;
 		});
 	} else if (freeExports && freeModule) {
-		if (module.exports == freeExports) { // in Node.js or RingoJS v0.8.0+
+		if (module.exports == freeExports) {
+			// in Node.js, io.js, or RingoJS v0.8.0+
 			freeModule.exports = punycode;
-		} else { // in Narwhal or RingoJS v0.7.0-
+		} else {
+			// in Narwhal or RingoJS v0.7.0-
 			for (key in punycode) {
 				punycode.hasOwnProperty(key) && (freeExports[key] = punycode[key]);
 			}
 		}
-	} else { // in Rhino or a web browser
+	} else {
+		// in Rhino or a web browser
 		root.punycode = punycode;
 	}
 
@@ -3783,8 +3758,9 @@ var StringDecoder;
 
 util.inherits(Readable, Stream);
 
+var Duplex;
 function ReadableState(options, stream) {
-  var Duplex = require('./_stream_duplex');
+  Duplex = Duplex || require('./_stream_duplex');
 
   options = options || {};
 
@@ -3850,8 +3826,9 @@ function ReadableState(options, stream) {
   }
 }
 
+var Duplex;
 function Readable(options) {
-  var Duplex = require('./_stream_duplex');
+  Duplex = Duplex || require('./_stream_duplex');
 
   if (!(this instanceof Readable))
     return new Readable(options);
@@ -4952,8 +4929,9 @@ function WriteReq(chunk, encoding, cb) {
   this.next = null;
 }
 
+var Duplex;
 function WritableState(options, stream) {
-  var Duplex = require('./_stream_duplex');
+  Duplex = Duplex || require('./_stream_duplex');
 
   options = options || {};
 
@@ -5061,8 +5039,9 @@ Object.defineProperty(WritableState.prototype, 'buffer', {
 }catch(_){}}());
 
 
+var Duplex;
 function Writable(options) {
-  var Duplex = require('./_stream_duplex');
+  Duplex = Duplex || require('./_stream_duplex');
 
   // Writable ctor is applied to Duplexes, though they're not
   // instanceof Writable, they're instanceof Readable.
