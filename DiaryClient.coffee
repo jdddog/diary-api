@@ -8,7 +8,7 @@ class DiaryClient
   *
   * @name DiaryClient#DEFAULT_HOST
   * @type string
-  * @default sitcalprd01.its.auckland.ac.nz
+  * @default diaryapi.auckland.ac.nz
   ###
 
   DEFAULT_HOST: 'diaryapi.auckland.ac.nz'
@@ -547,8 +547,8 @@ class DiaryClient
     toUTCString = (date) ->
       return (new Date(date.getTime() + date.getTimezoneOffset() * 60000)).toISOString()
 
-    action = (resolve, reject) -> @sendRequest('/calendars/' + calendarId + '/find_events/', 'GET',
-      {startDate: toUTCString(startDate), endDate: toUTCString(endDate)}, resolve, reject)
+    action = (resolve, reject) -> @sendRequest('/calendars/' + calendarId + '/find_events/?endAfter=' +
+        toUTCString(startDate) + '&startBefore=' + toUTCString(endDate), 'GET', {}, resolve, reject)
     new Promise(action.bind(@))
 
 exports.DiaryClient = DiaryClient
